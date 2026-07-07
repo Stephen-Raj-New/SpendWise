@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Search, Sun, Moon, Bell, Plus, User as UserIcon, LogOut, Settings as SettingsIcon } from 'lucide-react';
+import { Search, Sun, Moon, Bell, Plus, User as UserIcon, LogOut, Settings as SettingsIcon, Menu } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
+// ... (keeping imports intact via regex/replace carefully)
 import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../slices/authSlice';
-import { disconnectSocket } from '../../services/socket';
-import type { RootState } from '../../store';
+import { logout } from '../../features/auth/redux/authSlice';
+import Client from '../../api';
+import type { RootState } from '../../store/store';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../../lib/utils';
 
@@ -12,12 +13,14 @@ interface NavbarProps {
   searchPlaceholder?: string;
   actionLabel?: string;
   onAction?: () => void;
+  onMenuClick?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   searchPlaceholder = 'Search...',
   actionLabel = 'Add Transaction',
   onAction,
+  onMenuClick,
 }) => {
   const { theme, toggleTheme } = useTheme();
   const dispatch = useDispatch();
@@ -27,15 +30,23 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const handleLogout = () => {
     dispatch(logout());
-    disconnectSocket();
+    import('../../api/socket').then(({ disconnectSocket }) => disconnectSocket());
     navigate('/login');
   };
 
   return (
-    <header className="fixed top-0 left-64 right-0 z-50 h-16 border-b border-slate-200 bg-white/80 px-6 backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/80">
+    <header className="fixed top-0 md:left-64 left-0 right-0 z-50 h-16 border-b border-slate-200 bg-white/80 px-4 sm:px-6 backdrop-blur-md dark:border-slate-700 dark:bg-slate-900/80">
       <div className="flex h-full items-center justify-between">
-        {/* Search */}
-        <div className="flex flex-1 items-center">
+        {/* Left Side: Mobile Menu & Search */}
+        <div className="flex flex-1 items-center space-x-2 sm:space-x-4">
+          <button
+            onClick={onMenuClick}
+            className="md:hidden p-2 -ml-2 text-slate-500 hover:bg-slate-100 rounded-lg dark:text-slate-400 dark:hover:bg-slate-800 transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
+          
           <div className="relative w-full max-w-md hidden sm:block">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input

@@ -3,10 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { setCredentials } from '../slices/authSlice';
-import api from '../services/api';
-import { connectSocket } from '../services/socket';
-
+import { setCredentials } from '../features/auth/redux/authSlice';
+import { loginService } from '../features/auth/services';
 const DEV_AUTOFILL = true;
 
 const validationSchema = Yup.object().shape({
@@ -34,13 +32,14 @@ const Login = () => {
 
   const handleSubmit = async (values: any, { setSubmitting, setStatus }: any) => {
     try {
-      const response = await api.post('/auth/login', { ...values, role });
-      const { access_token } = response.data;
+      const data = await loginService({ ...values, role });
+      const { access_token } = data;
+      const responseRole = data.role || role; 
       
-      dispatch(setCredentials({ token: access_token, role }));
-      connectSocket();
+      dispatch(setCredentials({ token: access_token, role: responseRole }));
+      import('../api/socket').then(({ connectSocket }) => connectSocket());
 
-      if (role === 'admin') {
+      if (responseRole === 'admin') {
         navigate('/admin/dashboard');
       } else {
         navigate('/dashboard');

@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import type { RootState } from '../store';
-import { logout } from '../slices/authSlice';
-import { disconnectSocket } from '../services/socket';
+import type { RootState } from '../store/store';
+import { logout } from '../features/auth/redux/authSlice';
+import Client from '../api';
 import { Navbar } from '../components/layout/Navbar';
 import { 
   LayoutDashboard, 
@@ -19,6 +19,7 @@ import {
   LogOut,
   Users
 } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 // Context to allow pages to set Navbar properties
 interface LayoutContextType {
@@ -44,7 +45,7 @@ const DashboardLayout = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    disconnectSocket();
+    import('../api/socket').then(({ disconnectSocket }) => disconnectSocket());
   };
 
   const userLinks = [
@@ -70,16 +71,36 @@ const DashboardLayout = () => {
 
   const links = role === 'admin' ? adminLinks : userLinks;
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
     <LayoutContext.Provider value={{ setNavbarProps }}>
       <div className="flex min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-200">
+        
+        {/* Mobile Sidebar Backdrop */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm md:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
         {/* Fixed Sidebar */}
-        <aside className="fixed bottom-0 left-0 top-0 z-40 w-64 border-r border-slate-200 bg-white flex flex-col dark:border-slate-700 dark:bg-slate-800">
-          <div className="p-6">
-            <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-500">ExpensePro</h1>
-            <p className="text-xs text-slate-500 uppercase tracking-wider mt-1 dark:text-slate-400">
-              {role === 'admin' ? 'Admin Panel' : 'User Portal'}
-            </p>
+        <aside className={cn(
+          "fixed bottom-0 left-0 top-0 z-50 w-64 border-r border-slate-200 bg-white flex flex-col dark:border-slate-700 dark:bg-slate-800 transition-transform duration-300 md:translate-x-0",
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        )}>
+          <div className="p-6 flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-500">ExpensePro</h1>
+              <p className="text-xs text-slate-500 uppercase tracking-wider mt-1 dark:text-slate-400">
+                {role === 'admin' ? 'Admin Panel' : 'User Portal'}
+              </p>
+            </div>
+            {/* Optional close button for mobile */}
+            <button onClick={() => setIsSidebarOpen(false)} className="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg dark:text-slate-400 dark:hover:bg-slate-800">
+               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
           </div>
           <nav className="flex-1 overflow-y-auto px-4 space-y-1 pb-4 scrollbar-thin">
             {links.map((link) => (
@@ -111,13 +132,13 @@ const DashboardLayout = () => {
         </aside>
 
         {/* Main Content Area */}
-        <div className="flex flex-1 flex-col ml-64">
+        <div className="flex flex-1 flex-col md:ml-64 w-full">
           {/* Fixed Navbar */}
-          <Navbar {...navbarProps} />
+          <Navbar {...navbarProps} onMenuClick={() => setIsSidebarOpen(true)} />
           
           {/* Scrollable Content with padding for navbar */}
-          <main className="flex-1 pt-16 p-8 overflow-x-hidden">
-            <div className="mx-auto max-w-7xl">
+          <main className="flex-1 pt-16 p-4 sm:p-6 lg:p-8 overflow-x-hidden w-full max-w-[100vw]">
+            <div className="mx-auto max-w-7xl w-full">
               <Outlet />
             </div>
           </main>

@@ -12,6 +12,7 @@ import { BudgetModule } from './budget/budget.module';
 import { AdminModule } from './admin/admin.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ReportsModule } from './reports/reports.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ReportsModule } from './reports/reports.module';
     ReportsModule,
     NotificationsModule,
     AdminModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

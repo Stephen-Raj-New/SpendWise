@@ -1,11 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { store } from './store';
+import { store } from './store/store';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
+import DashboardPage from './components/Dashboard/DashboardPage';
 import { Card } from './components/ui/Card';
 import SettingsPlaceholder from './pages/SettingsPlaceholder';
 
@@ -36,7 +37,7 @@ const App = () => {
                 </ProtectedRoute>
               }
             >
-              <Route path="/dashboard" element={<Placeholder title="Dashboard" />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/income" element={<Placeholder title="Income" />} />
               <Route path="/expenses" element={<Placeholder title="Expenses" />} />
               <Route path="/transactions" element={<Placeholder title="Transactions" />} />

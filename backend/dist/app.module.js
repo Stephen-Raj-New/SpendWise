@@ -21,6 +21,7 @@ const budget_module_1 = require("./budget/budget.module");
 const admin_module_1 = require("./admin/admin.module");
 const notifications_module_1 = require("./notifications/notifications.module");
 const reports_module_1 = require("./reports/reports.module");
+const dashboard_module_1 = require("./dashboard/dashboard.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -44,6 +45,7 @@ exports.AppModule = AppModule = __decorate([
             reports_module_1.ReportsModule,
             notifications_module_1.NotificationsModule,
             admin_module_1.AdminModule,
+            dashboard_module_1.DashboardModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
