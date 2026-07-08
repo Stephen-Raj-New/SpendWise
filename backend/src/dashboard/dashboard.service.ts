@@ -25,7 +25,7 @@ export class DashboardService {
       expenses: 3450,
       budgetGoal: 5000,
     };
-  }
+  } 
 
   async getIncomeVsExpense(userId: string) {
     return [
