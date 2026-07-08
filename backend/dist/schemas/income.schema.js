@@ -14,27 +14,47 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 let Income = class Income extends mongoose_2.Document {
     userId;
-    amount;
     source;
+    description;
+    category;
+    amount;
+    currency;
     date;
+    status;
 };
 exports.Income = Income;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'User', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'User', required: true, index: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Income.prototype, "userId", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({ required: true }),
-    __metadata("design:type", Number)
-], Income.prototype, "amount", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Income.prototype, "source", void 0);
 __decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Income.prototype, "description", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true, enum: ['Service Revenue', 'Product Sales', 'Consulting', 'Other'] }),
+    __metadata("design:type", String)
+], Income.prototype, "category", void 0);
+__decorate([
     (0, mongoose_1.Prop)({ required: true }),
+    __metadata("design:type", Number)
+], Income.prototype, "amount", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: 'INR' }),
+    __metadata("design:type", String)
+], Income.prototype, "currency", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true, index: true }),
     __metadata("design:type", Date)
 ], Income.prototype, "date", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ enum: ['Confirmed', 'Processing', 'Failed'], default: 'Confirmed' }),
+    __metadata("design:type", String)
+], Income.prototype, "status", void 0);
 exports.Income = Income = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Income);

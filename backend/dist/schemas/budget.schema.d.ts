@@ -33,15 +33,6 @@ export declare const BudgetSchema: import("mongoose").Schema<Budget, import("mon
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
         id: string;
     }>> | undefined;
-    limit?: import("mongoose").SchemaDefinitionProperty<number, Budget, Document<unknown, {}, Budget, {
-        id: string;
-    }, import("mongoose").DefaultSchemaOptions> & Omit<Budget & Required<{
-        _id: Types.ObjectId;
-    }> & {
-        __v: number;
-    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
-        id: string;
-    }>> | undefined;
     category?: import("mongoose").SchemaDefinitionProperty<string, Budget, Document<unknown, {}, Budget, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Budget & Required<{
@@ -51,7 +42,7 @@ export declare const BudgetSchema: import("mongoose").Schema<Budget, import("mon
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
         id: string;
     }>> | undefined;
-    spent?: import("mongoose").SchemaDefinitionProperty<number, Budget, Document<unknown, {}, Budget, {
+    limit?: import("mongoose").SchemaDefinitionProperty<number, Budget, Document<unknown, {}, Budget, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Budget & Required<{
         _id: Types.ObjectId;
@@ -61,6 +52,15 @@ export declare const BudgetSchema: import("mongoose").Schema<Budget, import("mon
         id: string;
     }>> | undefined;
     month?: import("mongoose").SchemaDefinitionProperty<string, Budget, Document<unknown, {}, Budget, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Budget & Required<{
+        _id: Types.ObjectId;
+    }> & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    spent?: import("mongoose").SchemaDefinitionProperty<number, Budget, Document<unknown, {}, Budget, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Budget & Required<{
         _id: Types.ObjectId;

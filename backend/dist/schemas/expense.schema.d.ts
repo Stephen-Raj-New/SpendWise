@@ -42,6 +42,15 @@ export declare const ExpenseSchema: import("mongoose").Schema<Expense, import("m
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
         id: string;
     }>> | undefined;
+    category?: import("mongoose").SchemaDefinitionProperty<string, Expense, Document<unknown, {}, Expense, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Expense & Required<{
+        _id: Types.ObjectId;
+    }> & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
     amount?: import("mongoose").SchemaDefinitionProperty<number, Expense, Document<unknown, {}, Expense, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Expense & Required<{
@@ -52,15 +61,6 @@ export declare const ExpenseSchema: import("mongoose").Schema<Expense, import("m
         id: string;
     }>> | undefined;
     merchant?: import("mongoose").SchemaDefinitionProperty<string, Expense, Document<unknown, {}, Expense, {
-        id: string;
-    }, import("mongoose").DefaultSchemaOptions> & Omit<Expense & Required<{
-        _id: Types.ObjectId;
-    }> & {
-        __v: number;
-    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
-        id: string;
-    }>> | undefined;
-    category?: import("mongoose").SchemaDefinitionProperty<string, Expense, Document<unknown, {}, Expense, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Expense & Required<{
         _id: Types.ObjectId;

@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 import DashboardPage from './components/Dashboard/DashboardPage';
+import IncomePage from './components/Income/IncomePage';
 import { Card } from './components/ui/Card';
 import SettingsPlaceholder from './pages/SettingsPlaceholder';
 
@@ -38,7 +39,7 @@ const App = () => {
               }
             >
               <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/income" element={<Placeholder title="Income" />} />
+              <Route path="/income" element={<IncomePage />} />
               <Route path="/expenses" element={<Placeholder title="Expenses" />} />
               <Route path="/transactions" element={<Placeholder title="Transactions" />} />
               <Route path="/budget" element={<Placeholder title="Budget" />} />
