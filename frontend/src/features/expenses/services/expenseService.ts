@@ -42,13 +42,13 @@ export const expenseService = {
     return response.data;
   },
 
-  getExpenseSummary: async (range: string) => {
-    const response = await httpClients.get<ExpenseSummary>(`${UserEndpoints.expenses.list}/summary`, { params: { range } });
+  getExpenseSummary: async (query: any) => {
+    const response = await httpClients.get<ExpenseSummary>(`${UserEndpoints.expenses.list}/summary`, { params: query });
     return response.data;
   },
 
-  getCategoryDistribution: async (range: string) => {
-    const response = await httpClients.get<CategoryDistribution[]>(`${UserEndpoints.expenses.list}/category-distribution`, { params: { range } });
+  getCategoryDistribution: async (query: any) => {
+    const response = await httpClients.get<CategoryDistribution[]>(`${UserEndpoints.expenses.list}/category-distribution`, { params: query });
     return response.data;
   },
 

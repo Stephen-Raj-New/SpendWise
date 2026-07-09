@@ -11,24 +11,24 @@ interface RequestWithUser extends Request {
 export declare class DashboardController {
     private readonly dashboardService;
     constructor(dashboardService: DashboardService);
-    getSummary(req: RequestWithUser, period?: string): Promise<{
+    getSummary(req: RequestWithUser, query: any): Promise<{
         totalBalance: number;
         totalBalanceTrendPct: number;
         income: any;
         expenses: any;
         budgetGoal: number;
     }>;
-    getIncomeVsExpense(req: RequestWithUser): Promise<{
+    getIncomeVsExpense(req: RequestWithUser, query: any): Promise<{
         label: string;
         income: any;
         expense: any;
     }[]>;
-    getSpendingByCategory(req: RequestWithUser): Promise<{
+    getSpendingByCategory(req: RequestWithUser, query: any): Promise<{
         category: any;
         amount: any;
         color: string;
     }[]>;
-    getRecentTransactions(req: RequestWithUser, page?: number, limit?: number): Promise<{
+    getRecentTransactions(req: RequestWithUser, page: number | undefined, limit: number | undefined, query: any): Promise<{
         data: {
             id: import("mongoose").Types.ObjectId;
             merchant: string;
@@ -41,7 +41,7 @@ export declare class DashboardController {
         totalPages: number;
         totalItems: number;
     }>;
-    getBudgetProgress(req: RequestWithUser): Promise<{
+    getBudgetProgress(req: RequestWithUser, query: any): Promise<{
         category: string;
         spent: any;
         limit: number;

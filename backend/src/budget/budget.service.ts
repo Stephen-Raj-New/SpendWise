@@ -12,20 +12,70 @@ export class BudgetService {
     @InjectModel(Expense.name) private expenseModel: Model<Expense>,
   ) {}
 
-  async getBudgets(userId: string, month: string) {
-    const uid = new Types.ObjectId(userId);
-    const budgets = await this.budgetModel.find({ userId: uid, month });
+  private getMonthRange(query: any = {}): { start: Date; end: Date } {
+    if (typeof query === 'string') {
+      try {
+        query = JSON.parse(query);
+      } catch (e) {
+        query = { range: 'month', year: new Date().getFullYear(), month: new Date().getMonth() + 1 };
+      }
+    }
+    const { range, year, month, quarter } = query || {};
     
-    // Calculate spent for each budget in real-time
-    const [year, monthStr] = month.split('-');
-    const startDate = new Date(Number(year), Number(monthStr) - 1, 1);
-    const endDate = new Date(Number(year), Number(monthStr), 0, 23, 59, 59, 999);
+    let start, end;
+    
+    if (range === 'this-year' || range === 'year') {
+      start = year ? new Date(Number(year), 0, 1) : new Date(new Date().getFullYear(), 0, 1);
+      end = year ? new Date(Number(year), 11, 31, 23, 59, 59, 999) : new Date(new Date().getFullYear(), 11, 31, 23, 59, 59, 999);
+    } else if (range === 'month' && year && month) {
+      start = new Date(Number(year), Number(month) - 1, 1);
+      end = new Date(Number(year), Number(month), 0, 23, 59, 59, 999);
+    } else if (range === 'quarter' && year && quarter) {
+      const qStartMonth = (Number(quarter) - 1) * 3;
+      start = new Date(Number(year), qStartMonth, 1);
+      end = new Date(Number(year), qStartMonth + 3, 0, 23, 59, 59, 999);
+    } else if (range === 'last-month') {
+      const date = new Date();
+      start = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+      end = new Date(date.getFullYear(), date.getMonth(), 0, 23, 59, 59, 999);
+    } else {
+      // default to this-month
+      const date = new Date();
+      start = new Date(date.getFullYear(), date.getMonth(), 1);
+      end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+    }
+    
+    return { start, end };
+  }
 
+  async getBudgets(userId: string, query: any) {
+    const uid = new Types.ObjectId(userId);
+    const { start, end } = this.getMonthRange(query);
+    
+    const startMonthStr = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}`;
+    const endMonthStr = `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}`;
+    // Aggregate budgets across the selected month range
+    const budgets = await this.budgetModel.aggregate([
+      { 
+        $match: { 
+          userId: uid, 
+          month: { $gte: startMonthStr, $lte: endMonthStr } 
+        } 
+      },
+      {
+        $group: {
+          _id: '$category',
+          limit: { $sum: '$limit' },
+          budgets: { $push: '$$ROOT' }
+        }
+      }
+    ]);
+    
     const expenses = await this.expenseModel.aggregate([
       { 
         $match: { 
           userId: uid, 
-          date: { $gte: startDate, $lte: endDate } 
+          date: { $gte: start, $lte: end } 
         } 
       },
       { 
@@ -39,9 +89,15 @@ export class BudgetService {
     const spentMap = new Map(expenses.map(e => [e._id, e.totalSpent]));
 
     return budgets.map(b => {
-      const bObj = b.toObject();
-      bObj.spent = spentMap.get(b.category) || 0;
-      return bObj;
+      const firstBudget = b.budgets[0];
+      return {
+        _id: firstBudget._id, // use the first budget ID for deletion references
+        userId: firstBudget.userId,
+        category: b._id,
+        limit: b.limit,
+        month: firstBudget.month,
+        spent: spentMap.get(b._id) || 0
+      };
     });
   }
 

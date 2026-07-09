@@ -18,8 +18,8 @@ export interface SummaryReport {
 }
 
 export const reportService = {
-  getSummaryReport: async (year: number) => {
-    const response = await httpClients.get<SummaryReport>(`${UserEndpoints.reports.list}/summary`, { params: { year } });
+  getSummaryReport: async (query?: any) => {
+    const response = await httpClients.get<SummaryReport>(`${UserEndpoints.reports.list}/summary`, { params: query });
     return response.data;
   },
 };

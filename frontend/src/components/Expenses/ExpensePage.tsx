@@ -4,6 +4,7 @@ import {
   fetchExpenseList, 
   fetchExpenseSummary, 
   fetchCategoryDistribution,
+  deleteExpense
 } from '../../features/expenses/redux/expenseThunk';
 import { expenseService } from '../../features/expenses/services/expenseService';
 import type { Expense } from '../../features/expenses/services/expenseService';
@@ -15,19 +16,31 @@ import { ProgressBar } from '../ui/ProgressBar';
 import { InsightCard } from '../ui/InsightCard';
 import { Badge } from '../ui/Badge';
 import { FilterBar } from '../ui/FilterBar';
-import { CreditCard, TrendingDown, Award, Download, FileText } from 'lucide-react';
+import { TimeFilter } from '../ui/TimeFilter';
+import type { TimeFilterState } from '../ui/TimeFilter';
+import { CreditCard, TrendingDown, Award, Download, FileText, Edit2, Trash2 } from 'lucide-react';
 import { AddExpenseModal } from './AddExpenseModal';
+import { ConfirmModal } from '../ui/ConfirmModal';
 import { generatePDF } from '../../utils/generatePDF';
+import toast from 'react-hot-toast';
 
 const ExpensePage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { setNavbarProps } = useLayout();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [selectedRange, setSelectedRange] = useState('month');
+  const [editData, setEditData] = useState<Expense | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
+  const [timeFilter, setTimeFilter] = useState<TimeFilterState>({
+    range: 'month',
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    quarter: Math.floor(new Date().getMonth() / 3) + 1,
+  });
   
   // Local state for pagination and filtering
   const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState<{ merchant?: string; category?: string; range?: string }>({ range: 'month' });
+  const [filters, setFilters] = useState<{ merchant?: string; category?: string; range?: string, year?: number, month?: number, quarter?: number }>({});
 
   const {
     list,
@@ -38,25 +51,34 @@ const ExpensePage: React.FC = () => {
 
   const fetchAllData = () => {
     dispatch(fetchExpenseList({ ...filters, page, limit: 10 }));
-    dispatch(fetchExpenseSummary(selectedRange));
-    dispatch(fetchCategoryDistribution(selectedRange));
+    dispatch(fetchExpenseSummary(timeFilter as any));
+    dispatch(fetchCategoryDistribution(timeFilter as any));
   };
 
   useEffect(() => {
     setNavbarProps({
       searchPlaceholder: 'Search expenses...',
       actionLabel: 'Add Expense',
-      onAction: () => setIsAddModalOpen(true),
+      onAction: () => {
+        setEditData(null);
+        setIsAddModalOpen(true);
+      },
     });
   }, [setNavbarProps]);
 
   useEffect(() => {
-    setFilters(prev => ({ ...prev, range: selectedRange }));
-  }, [selectedRange]);
+    setFilters(prev => ({ 
+      ...prev, 
+      range: timeFilter.range,
+      year: timeFilter.year,
+      month: timeFilter.month,
+      quarter: timeFilter.quarter
+    }));
+  }, [timeFilter]);
 
   useEffect(() => {
     fetchAllData();
-  }, [dispatch, filters, page, selectedRange]);
+  }, [dispatch, filters, page]);
 
   const handleExportCsv = async () => {
     try {
@@ -87,6 +109,20 @@ const ExpensePage: React.FC = () => {
       });
     } catch (err) {
       console.error('Failed to export PDF', err);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!expenseToDelete) return;
+    try {
+      await dispatch(deleteExpense(expenseToDelete)).unwrap();
+      toast.success('Expense deleted successfully');
+      fetchAllData();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete expense');
+    } finally {
+      setIsDeleteModalOpen(false);
+      setExpenseToDelete(null);
     }
   };
 
@@ -125,6 +161,33 @@ const ExpensePage: React.FC = () => {
           ₹{row.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
         </div>
       )
+    },
+    {
+      header: 'Actions',
+      accessor: (row: Expense) => (
+        <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={() => {
+              setEditData(row);
+              setIsAddModalOpen(true);
+            }}
+            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded dark:hover:bg-blue-900/50 dark:hover:text-blue-400 transition-colors"
+            title="Edit"
+          >
+            <Edit2 size={16} />
+          </button>
+          <button
+            onClick={() => {
+              setExpenseToDelete(row._id);
+              setIsDeleteModalOpen(true);
+            }}
+            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded dark:hover:bg-red-900/50 dark:hover:text-red-400 transition-colors"
+            title="Delete"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      )
     }
   ];
 
@@ -136,27 +199,15 @@ const ExpensePage: React.FC = () => {
           <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Expenses Overview</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Track and manage your spending.</p>
         </div>
-        <div className="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
-          {['month', 'quarter', 'year'].map((r) => (
-            <button
-              key={r}
-              onClick={() => setSelectedRange(r)}
-              className={`rounded-md px-4 py-1.5 text-sm font-medium capitalize transition-colors ${
-                selectedRange === r
-                  ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
-                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-            >
-              {r}
-            </button>
-          ))}
+        <div className="flex">
+          <TimeFilter filter={timeFilter} onChange={setTimeFilter} />
         </div>
       </div>
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         <StatCard
-          title={`${selectedRange.charAt(0).toUpperCase() + selectedRange.slice(1)}ly Total`}
+          title={`${timeFilter.range.charAt(0).toUpperCase() + timeFilter.range.slice(1)}ly Total`}
           value={summary ? `₹${summary.monthlyTotal.toLocaleString()}` : '...'}
           icon={<CreditCard />}
           trend={summary ? { 
@@ -293,9 +344,26 @@ const ExpensePage: React.FC = () => {
 
       <AddExpenseModal 
         isOpen={isAddModalOpen} 
-        onClose={() => setIsAddModalOpen(false)} 
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setEditData(null);
+        }} 
         onSuccess={() => {
           fetchAllData();
+        }}
+        initialData={editData}
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        title="Delete Expense"
+        message="Are you sure you want to delete this expense record? This action cannot be undone and will affect your total balances."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDelete}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setExpenseToDelete(null);
         }}
       />
     </div>

@@ -45,13 +45,13 @@ export const incomeService = {
     return response.data;
   },
 
-  getIncomeSummary: async (range: string) => {
-    const response = await httpClients.get<IncomeSummary>(`${UserEndpoints.income.list}/summary`, { params: { range } });
+  getIncomeSummary: async (query: any) => {
+    const response = await httpClients.get<IncomeSummary>(`${UserEndpoints.income.list}/summary`, { params: query });
     return response.data;
   },
 
-  getSourceDistribution: async (range: string) => {
-    const response = await httpClients.get<SourceDistribution[]>(`${UserEndpoints.income.list}/source-distribution`, { params: { range } });
+  getSourceDistribution: async (query: any) => {
+    const response = await httpClients.get<SourceDistribution[]>(`${UserEndpoints.income.list}/source-distribution`, { params: query });
     return response.data;
   },
 

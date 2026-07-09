@@ -44,24 +44,24 @@ export interface BudgetProgressData {
 }
 
 export const dashboardService = {
-  getSummary: async (period?: string): Promise<DashboardSummary> => {
-    const res = await Client.dashboard.getSummary(period);
+  getSummary: async (query?: any): Promise<DashboardSummary> => {
+    const res = await Client.dashboard.getSummary(query);
     return res.data;
   },
-  getIncomeVsExpense: async (): Promise<IncomeVsExpenseData[]> => {
-    const res = await Client.dashboard.getIncomeVsExpense();
+  getIncomeVsExpense: async (query?: any): Promise<IncomeVsExpenseData[]> => {
+    const res = await Client.dashboard.getIncomeVsExpense(query);
     return res.data;
   },
-  getSpendingByCategory: async (): Promise<CategorySpendingData[]> => {
-    const res = await Client.dashboard.getSpendingByCategory();
+  getSpendingByCategory: async (query?: any): Promise<CategorySpendingData[]> => {
+    const res = await Client.dashboard.getSpendingByCategory(query);
     return res.data;
   },
-  getRecentTransactions: async (page = 1, limit = 5): Promise<PaginatedTransactions> => {
-    const res = await Client.dashboard.getRecentTransactions(page, limit);
+  getRecentTransactions: async (page = 1, limit = 5, query?: any): Promise<PaginatedTransactions> => {
+    const res = await Client.dashboard.getRecentTransactions(page, limit, query);
     return res.data;
   },
-  getBudgetProgress: async (): Promise<BudgetProgressData[]> => {
-    const res = await Client.dashboard.getBudgetProgress();
+  getBudgetProgress: async (query?: any): Promise<BudgetProgressData[]> => {
+    const res = await Client.dashboard.getBudgetProgress(query);
     return res.data;
   }
 };

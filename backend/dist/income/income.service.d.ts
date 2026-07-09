@@ -23,7 +23,7 @@ export declare class IncomeService {
         limit: number;
         totalPages: number;
     }>;
-    getSummary(userId: string, range: string): Promise<{
+    getSummary(userId: string, query: any): Promise<{
         monthlyTotal: any;
         monthlyTotalTrendPct: number;
         avgPerTransaction: number;
@@ -32,7 +32,7 @@ export declare class IncomeService {
             percentage: number;
         };
     }>;
-    getSourceDistribution(userId: string, range: string): Promise<{
+    getSourceDistribution(userId: string, query: any): Promise<{
         source: any;
         amount: any;
         percentage: number;

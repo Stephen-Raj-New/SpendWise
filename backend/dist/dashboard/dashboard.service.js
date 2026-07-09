@@ -31,21 +31,46 @@ let DashboardService = class DashboardService {
         this.budgetModel = budgetModel;
         this.categoryModel = categoryModel;
     }
-    getMonthRange(date = new Date()) {
-        const start = new Date(date.getFullYear(), date.getMonth(), 1);
-        const end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+    getMonthRange(query = {}) {
+        if (typeof query === 'string')
+            query = { range: query };
+        const { range, year, month, quarter } = query || {};
+        let start, end;
+        if (range === 'this-year' || range === 'year') {
+            start = year ? new Date(Number(year), 0, 1) : new Date(new Date().getFullYear(), 0, 1);
+            end = year ? new Date(Number(year), 11, 31, 23, 59, 59, 999) : new Date(new Date().getFullYear(), 11, 31, 23, 59, 59, 999);
+        }
+        else if (range === 'month' && year && month) {
+            start = new Date(Number(year), Number(month) - 1, 1);
+            end = new Date(Number(year), Number(month), 0, 23, 59, 59, 999);
+        }
+        else if (range === 'quarter' && year && quarter) {
+            const qStartMonth = (Number(quarter) - 1) * 3;
+            start = new Date(Number(year), qStartMonth, 1);
+            end = new Date(Number(year), qStartMonth + 3, 0, 23, 59, 59, 999);
+        }
+        else if (range === 'last-month') {
+            const date = new Date();
+            start = new Date(date.getFullYear(), date.getMonth() - 1, 1);
+            end = new Date(date.getFullYear(), date.getMonth(), 0, 23, 59, 59, 999);
+        }
+        else {
+            const date = new Date();
+            start = new Date(date.getFullYear(), date.getMonth(), 1);
+            end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+        }
         return { $gte: start, $lte: end };
     }
-    async getSummary(userId, period) {
+    async getSummary(userId, query = {}) {
         const uid = new mongoose_2.Types.ObjectId(userId);
-        const currentMonth = this.getMonthRange();
-        const prevDate = new Date();
+        const currentMonth = this.getMonthRange(query);
+        const prevDate = new Date(currentMonth.$gte);
         prevDate.setMonth(prevDate.getMonth() - 1);
-        const prevMonth = this.getMonthRange(prevDate);
+        const prevMonth = this.getMonthRange({ ...query, range: 'last-month' });
         const [currentIncome, currentExpense, prevIncome, prevExpense, budgets] = await Promise.all([
-            this.incomeModel.aggregate([{ $match: { userId: uid, date: currentMonth } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
+            this.incomeModel.aggregate([{ $match: { userId: uid, date: currentMonth, status: 'Confirmed' } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
             this.expenseModel.aggregate([{ $match: { userId: uid, date: currentMonth } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
-            this.incomeModel.aggregate([{ $match: { userId: uid, date: prevMonth } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
+            this.incomeModel.aggregate([{ $match: { userId: uid, date: prevMonth, status: 'Confirmed' } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
             this.expenseModel.aggregate([{ $match: { userId: uid, date: prevMonth } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
             this.budgetModel.find({ userId: uid, month: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}` })
         ]);
@@ -71,28 +96,30 @@ let DashboardService = class DashboardService {
             budgetGoal,
         };
     }
-    async getIncomeVsExpense(userId) {
+    async getIncomeVsExpense(userId, query = {}) {
         const uid = new mongoose_2.Types.ObjectId(userId);
+        const endRange = this.getMonthRange(query);
+        const endDate = new Date(endRange.$lte);
         const data = [];
         for (let i = 5; i >= 0; i--) {
-            const d = new Date();
+            const d = new Date(endDate);
             d.setMonth(d.getMonth() - i);
-            const range = this.getMonthRange(d);
+            const range = this.getMonthRange({ range: 'month', year: d.getFullYear(), month: d.getMonth() + 1 });
             const [inc, exp] = await Promise.all([
-                this.incomeModel.aggregate([{ $match: { userId: uid, date: range } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
+                this.incomeModel.aggregate([{ $match: { userId: uid, date: range, status: 'Confirmed' } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
                 this.expenseModel.aggregate([{ $match: { userId: uid, date: range } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
             ]);
             data.push({
-                label: d.toLocaleString('default', { month: 'short' }),
+                label: d.toLocaleString('default', { month: 'short', year: '2-digit' }),
                 income: inc[0]?.total || 0,
                 expense: exp[0]?.total || 0
             });
         }
         return data;
     }
-    async getSpendingByCategory(userId) {
+    async getSpendingByCategory(userId, query = {}) {
         const uid = new mongoose_2.Types.ObjectId(userId);
-        const range = this.getMonthRange();
+        const range = this.getMonthRange(query);
         const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6'];
         const stats = await this.expenseModel.aggregate([
             { $match: { userId: uid, date: range } },
@@ -105,11 +132,12 @@ let DashboardService = class DashboardService {
             color: colors[idx % colors.length]
         }));
     }
-    async getRecentTransactions(userId, page, limit) {
+    async getRecentTransactions(userId, page, limit, query = {}) {
         const uid = new mongoose_2.Types.ObjectId(userId);
+        const dateRange = this.getMonthRange(query);
         const [incomes, expenses] = await Promise.all([
-            this.incomeModel.find({ userId: uid }).sort({ date: -1 }).limit(limit),
-            this.expenseModel.find({ userId: uid }).sort({ date: -1 }).limit(limit)
+            this.incomeModel.find({ userId: uid, date: dateRange }).sort({ date: -1 }).limit(limit),
+            this.expenseModel.find({ userId: uid, date: dateRange }).sort({ date: -1 }).limit(limit)
         ]);
         const mapped = [
             ...incomes.map(i => ({ id: i._id, merchant: i.source, category: i.category, date: i.date, amount: i.amount, type: 'income' })),
@@ -123,10 +151,11 @@ let DashboardService = class DashboardService {
             totalItems: mapped.length,
         };
     }
-    async getBudgetProgress(userId) {
+    async getBudgetProgress(userId, query = {}) {
         const uid = new mongoose_2.Types.ObjectId(userId);
-        const currentMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
-        const range = this.getMonthRange();
+        const range = this.getMonthRange(query);
+        const monthTarget = new Date(range.$gte);
+        const currentMonth = `${monthTarget.getFullYear()}-${String(monthTarget.getMonth() + 1).padStart(2, '0')}`;
         const budgets = await this.budgetModel.find({ userId: uid, month: currentMonth });
         if (budgets.length === 0)
             return [];

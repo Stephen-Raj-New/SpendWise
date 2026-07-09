@@ -9,11 +9,11 @@ class Client {
   };
   
   dashboard = {
-    getSummary: (period?: string) => httpClients.get(UserEndpoints.dashboard.summary + (period ? `?period=${period}` : '')),
-    getIncomeVsExpense: () => httpClients.get(UserEndpoints.dashboard.incomeVsExpense),
-    getSpendingByCategory: () => httpClients.get(UserEndpoints.dashboard.spendingByCategory),
-    getRecentTransactions: (page: number, limit: number) => httpClients.get(`${UserEndpoints.dashboard.recentTransactions}?page=${page}&limit=${limit}`),
-    getBudgetProgress: () => httpClients.get(UserEndpoints.dashboard.budgetProgress),
+    getSummary: (query?: any) => httpClients.get(UserEndpoints.dashboard.summary, { params: query }),
+    getIncomeVsExpense: (query?: any) => httpClients.get(UserEndpoints.dashboard.incomeVsExpense, { params: query }),
+    getSpendingByCategory: (query?: any) => httpClients.get(UserEndpoints.dashboard.spendingByCategory, { params: query }),
+    getRecentTransactions: (page: number, limit: number, query?: any) => httpClients.get(UserEndpoints.dashboard.recentTransactions, { params: { page, limit, ...query } }),
+    getBudgetProgress: (query?: any) => httpClients.get(UserEndpoints.dashboard.budgetProgress, { params: query }),
   };
   
   adminDashboard = {

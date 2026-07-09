@@ -26,15 +26,37 @@ let TransactionsService = class TransactionsService {
         this.incomeModel = incomeModel;
         this.expenseModel = expenseModel;
     }
-    getDateRange(range) {
-        const end = new Date();
-        const start = new Date();
-        if (range === 'year')
-            start.setFullYear(start.getFullYear() - 1);
-        else if (range === 'quarter')
-            start.setMonth(start.getMonth() - 3);
-        else
-            start.setMonth(start.getMonth() - 1);
+    getDateRange(query) {
+        if (typeof query === 'string')
+            query = { range: query };
+        const { range = 'month', year, month, quarter } = query || {};
+        let start, end;
+        if (range === 'year' && year) {
+            start = new Date(Number(year), 0, 1);
+            end = new Date(Number(year), 11, 31, 23, 59, 59, 999);
+        }
+        else if (range === 'month' && year && month) {
+            start = new Date(Number(year), Number(month) - 1, 1);
+            end = new Date(Number(year), Number(month), 0, 23, 59, 59, 999);
+        }
+        else if (range === 'quarter' && year && quarter) {
+            const qStartMonth = (Number(quarter) - 1) * 3;
+            start = new Date(Number(year), qStartMonth, 1);
+            end = new Date(Number(year), qStartMonth + 3, 0, 23, 59, 59, 999);
+        }
+        else if (range !== 'all') {
+            end = new Date();
+            start = new Date();
+            if (range === 'year')
+                start.setFullYear(start.getFullYear() - 1);
+            else if (range === 'quarter')
+                start.setMonth(start.getMonth() - 3);
+            else
+                start.setMonth(start.getMonth() - 1);
+        }
+        else {
+            return null;
+        }
         return { $gte: start, $lte: end };
     }
     async findAll(userId, query) {
@@ -49,8 +71,10 @@ let TransactionsService = class TransactionsService {
             if (dateTo)
                 filter.date.$lte = new Date(dateTo);
         }
-        else if (range && range !== 'all') {
-            filter.date = this.getDateRange(range);
+        else if (query.range && query.range !== 'all') {
+            const rangeDate = this.getDateRange(query);
+            if (rangeDate)
+                filter.date = rangeDate;
         }
         let transactions = [];
         if (!type || type === 'income') {

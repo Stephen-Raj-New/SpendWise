@@ -22,10 +22,9 @@ let BudgetController = class BudgetController {
     constructor(budgetService) {
         this.budgetService = budgetService;
     }
-    async getBudgets(req, month) {
-        const currentMonth = month || `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+    async getBudgets(req, query) {
         const userId = req.user?.sub || req.user?.userId;
-        return this.budgetService.getBudgets(String(userId), currentMonth);
+        return this.budgetService.getBudgets(String(userId), query);
     }
     async setBudget(req, setBudgetDto) {
         const userId = req.user?.sub || req.user?.userId;
@@ -40,9 +39,9 @@ exports.BudgetController = BudgetController;
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Request)()),
-    __param(1, (0, common_1.Query)('month')),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], BudgetController.prototype, "getBudgets", null);
 __decorate([

@@ -10,24 +10,24 @@ export declare class DashboardService {
     private categoryModel;
     constructor(incomeModel: Model<Income>, expenseModel: Model<Expense>, budgetModel: Model<Budget>, categoryModel: Model<Category>);
     private getMonthRange;
-    getSummary(userId: string, period?: string): Promise<{
+    getSummary(userId: string, query?: any): Promise<{
         totalBalance: number;
         totalBalanceTrendPct: number;
         income: any;
         expenses: any;
         budgetGoal: number;
     }>;
-    getIncomeVsExpense(userId: string): Promise<{
+    getIncomeVsExpense(userId: string, query?: any): Promise<{
         label: string;
         income: any;
         expense: any;
     }[]>;
-    getSpendingByCategory(userId: string): Promise<{
+    getSpendingByCategory(userId: string, query?: any): Promise<{
         category: any;
         amount: any;
         color: string;
     }[]>;
-    getRecentTransactions(userId: string, page: number, limit: number): Promise<{
+    getRecentTransactions(userId: string, page: number, limit: number, query?: any): Promise<{
         data: {
             id: Types.ObjectId;
             merchant: string;
@@ -40,7 +40,7 @@ export declare class DashboardService {
         totalPages: number;
         totalItems: number;
     }>;
-    getBudgetProgress(userId: string): Promise<{
+    getBudgetProgress(userId: string, query?: any): Promise<{
         category: string;
         spent: any;
         limit: number;

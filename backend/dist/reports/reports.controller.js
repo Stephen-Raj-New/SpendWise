@@ -21,19 +21,18 @@ let ReportsController = class ReportsController {
     constructor(reportsService) {
         this.reportsService = reportsService;
     }
-    async getSummaryReport(req, year) {
-        const reportYear = year ? parseInt(year, 10) : new Date().getFullYear();
+    async getSummaryReport(req, query) {
         const userId = req.user?.sub || req.user?.userId;
-        return this.reportsService.getSummaryReport(String(userId), reportYear);
+        return this.reportsService.getSummaryReport(String(userId), query);
     }
 };
 exports.ReportsController = ReportsController;
 __decorate([
     (0, common_1.Get)('summary'),
     __param(0, (0, common_1.Request)()),
-    __param(1, (0, common_1.Query)('year')),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], ReportsController.prototype, "getSummaryReport", null);
 exports.ReportsController = ReportsController = __decorate([

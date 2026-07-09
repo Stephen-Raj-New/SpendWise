@@ -3,35 +3,35 @@ import { dashboardService } from '../services/dashboardService';
 
 export const fetchDashboardSummary = createAsyncThunk(
   'dashboard/fetchSummary',
-  async (period?: string) => {
-    return await dashboardService.getSummary(period);
+  async (query?: any) => {
+    return await dashboardService.getSummary(query);
   }
 );
 
 export const fetchIncomeVsExpense = createAsyncThunk(
   'dashboard/fetchIncomeVsExpense',
-  async () => {
-    return await dashboardService.getIncomeVsExpense();
+  async (query?: any) => {
+    return await dashboardService.getIncomeVsExpense(query);
   }
 );
 
 export const fetchSpendingByCategory = createAsyncThunk(
   'dashboard/fetchSpendingByCategory',
-  async () => {
-    return await dashboardService.getSpendingByCategory();
+  async (query?: any) => {
+    return await dashboardService.getSpendingByCategory(query);
   }
 );
 
 export const fetchRecentTransactions = createAsyncThunk(
   'dashboard/fetchRecentTransactions',
-  async ({ page, limit }: { page?: number; limit?: number }) => {
-    return await dashboardService.getRecentTransactions(page, limit);
+  async ({ page, limit, query }: { page?: number; limit?: number; query?: any }) => {
+    return await dashboardService.getRecentTransactions(page, limit, query);
   }
 );
 
 export const fetchBudgetProgress = createAsyncThunk(
   'dashboard/fetchBudgetProgress',
-  async () => {
-    return await dashboardService.getBudgetProgress();
+  async (query?: any) => {
+    return await dashboardService.getBudgetProgress(query);
   }
 );

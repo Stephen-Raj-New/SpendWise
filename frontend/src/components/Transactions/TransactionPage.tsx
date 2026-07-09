@@ -8,17 +8,24 @@ import { Card } from '../ui/Card';
 import { DataTable } from '../ui/DataTable';
 import { Badge } from '../ui/Badge';
 import { FilterBar } from '../ui/FilterBar';
+import { TimeFilter } from '../ui/TimeFilter';
+import type { TimeFilterState } from '../ui/TimeFilter';
 import { Download, ArrowUpRight, ArrowDownRight, FileText } from 'lucide-react';
 import { generatePDF } from '../../utils/generatePDF';
 
 const TransactionPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { setNavbarProps } = useLayout();
-  const [selectedRange, setSelectedRange] = useState('all');
+  const [timeFilter, setTimeFilter] = useState<TimeFilterState>({
+    range: 'month',
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    quarter: Math.floor(new Date().getMonth() / 3) + 1,
+  });
   
   // Local state for pagination and filtering
   const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState<{ type?: string; category?: string; range?: string }>({ range: 'all' });
+  const [filters, setFilters] = useState<{ type?: string; category?: string; range?: string, year?: number, month?: number, quarter?: number }>({});
 
   const { list, loading } = useAppSelector((state) => state.transactions);
 
@@ -35,13 +42,19 @@ const TransactionPage: React.FC = () => {
   }, [setNavbarProps]);
 
   useEffect(() => {
-    setFilters(prev => ({ ...prev, range: selectedRange }));
+    setFilters(prev => ({ 
+      ...prev, 
+      range: timeFilter.range,
+      year: timeFilter.year,
+      month: timeFilter.month,
+      quarter: timeFilter.quarter
+    }));
     setPage(1); // Reset page on filter change
-  }, [selectedRange]);
+  }, [timeFilter]);
 
   useEffect(() => {
     fetchAllData();
-  }, [dispatch, filters, page, selectedRange]);
+  }, [dispatch, filters, page]);
 
   const handleExportCsv = async () => {
     try {
@@ -132,20 +145,8 @@ const TransactionPage: React.FC = () => {
           <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Transactions Ledger</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Unified view of all your incomes and expenses.</p>
         </div>
-        <div className="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
-          {['all', 'month', 'quarter', 'year'].map((r) => (
-            <button
-              key={r}
-              onClick={() => setSelectedRange(r)}
-              className={`rounded-md px-4 py-1.5 text-sm font-medium capitalize transition-colors ${
-                selectedRange === r
-                  ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
-                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-            >
-              {r}
-            </button>
-          ))}
+        <div className="flex">
+          <TimeFilter filter={timeFilter} onChange={setTimeFilter} />
         </div>
       </div>
 
@@ -175,7 +176,12 @@ const TransactionPage: React.FC = () => {
               setPage(1);
             }}
             onClearFilters={() => {
-              setFilters({ range: selectedRange });
+              setFilters({ 
+                range: timeFilter.range,
+                year: timeFilter.year,
+                month: timeFilter.month,
+                quarter: timeFilter.quarter
+              });
               setPage(1);
             }}
           />

@@ -5,7 +5,8 @@ export declare class ReportsService {
     private incomeModel;
     private expenseModel;
     constructor(incomeModel: Model<Income>, expenseModel: Model<Expense>);
-    getSummaryReport(userId: string, year: number): Promise<{
+    private getMonthRange;
+    getSummaryReport(userId: string, query: any): Promise<{
         monthlyData: {
             label: string;
             income: any;

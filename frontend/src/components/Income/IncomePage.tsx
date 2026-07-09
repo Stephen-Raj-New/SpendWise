@@ -4,6 +4,7 @@ import {
   fetchIncomeList, 
   fetchIncomeSummary, 
   fetchSourceDistribution,
+  deleteIncomeThunk
 } from '../../features/income/redux/incomeThunk';
 import { setFilters, setPage } from '../../features/income/redux/incomeSlice';
 import { incomeService } from '../../features/income/services/incomeService';
@@ -16,15 +17,27 @@ import { ProgressBar } from '../ui/ProgressBar';
 import { InsightCard } from '../ui/InsightCard';
 import { Badge } from '../ui/Badge';
 import { FilterBar } from '../ui/FilterBar';
-import { Wallet, TrendingUp, Award, Download, FileText } from 'lucide-react';
+import { TimeFilter } from '../ui/TimeFilter';
+import type { TimeFilterState } from '../ui/TimeFilter';
+import { Wallet, TrendingUp, Award, Download, FileText, Edit2, Trash2 } from 'lucide-react';
 import { AddIncomeModal } from './AddIncomeModal';
+import { ConfirmModal } from '../ui/ConfirmModal';
 import { generatePDF } from '../../utils/generatePDF';
+import toast from 'react-hot-toast';
 
 const IncomePage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { setNavbarProps } = useLayout();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [selectedRange, setSelectedRange] = useState('month');
+  const [editData, setEditData] = useState<Income | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [incomeToDelete, setIncomeToDelete] = useState<string | null>(null);
+  const [timeFilter, setTimeFilter] = useState<TimeFilterState>({
+    range: 'month',
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    quarter: Math.floor(new Date().getMonth() / 3) + 1,
+  });
 
   const {
     list,
@@ -39,25 +52,33 @@ const IncomePage: React.FC = () => {
 
   const fetchAllData = () => {
     dispatch(fetchIncomeList({ ...filters, page, limit: 10 }));
-    dispatch(fetchIncomeSummary(selectedRange));
-    dispatch(fetchSourceDistribution(selectedRange));
+    dispatch(fetchIncomeSummary(timeFilter as any));
+    dispatch(fetchSourceDistribution(timeFilter as any));
   };
 
   useEffect(() => {
     setNavbarProps({
       searchPlaceholder: 'Search income...',
       actionLabel: 'Add Income',
-      onAction: () => setIsAddModalOpen(true),
+      onAction: () => {
+        setEditData(null);
+        setIsAddModalOpen(true);
+      },
     });
   }, [setNavbarProps]);
 
   useEffect(() => {
-    dispatch(setFilters({ range: selectedRange }));
-  }, [selectedRange, dispatch]);
+    dispatch(setFilters({ 
+      range: timeFilter.range,
+      year: timeFilter.year as any,
+      month: timeFilter.month as any,
+      quarter: timeFilter.quarter as any
+    }));
+  }, [timeFilter, dispatch]);
 
   useEffect(() => {
     fetchAllData();
-  }, [dispatch, filters, page, selectedRange]);
+  }, [dispatch, filters, page]);
 
   const handleExportCsv = async () => {
     try {
@@ -89,6 +110,20 @@ const IncomePage: React.FC = () => {
       });
     } catch (err) {
       console.error('Failed to export PDF', err);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!incomeToDelete) return;
+    try {
+      await dispatch(deleteIncomeThunk(incomeToDelete)).unwrap();
+      toast.success('Income deleted successfully');
+      fetchAllData();
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to delete income');
+    } finally {
+      setIsDeleteModalOpen(false);
+      setIncomeToDelete(null);
     }
   };
 
@@ -138,6 +173,33 @@ const IncomePage: React.FC = () => {
         return <Badge variant={variant}>{row.status}</Badge>;
       }
     },
+    {
+      header: 'Actions',
+      accessor: (row: Income) => (
+        <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={() => {
+              setEditData(row);
+              setIsAddModalOpen(true);
+            }}
+            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded dark:hover:bg-blue-900/50 dark:hover:text-blue-400 transition-colors"
+            title="Edit"
+          >
+            <Edit2 size={16} />
+          </button>
+          <button
+            onClick={() => {
+              setIncomeToDelete(row._id);
+              setIsDeleteModalOpen(true);
+            }}
+            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded dark:hover:bg-red-900/50 dark:hover:text-red-400 transition-colors"
+            title="Delete"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      )
+    }
   ];
 
   return (
@@ -148,27 +210,15 @@ const IncomePage: React.FC = () => {
           <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Income Overview</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Track and manage your revenue streams.</p>
         </div>
-        <div className="flex rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
-          {['month', 'quarter', 'year'].map((r) => (
-            <button
-              key={r}
-              onClick={() => setSelectedRange(r)}
-              className={`rounded-md px-4 py-1.5 text-sm font-medium capitalize transition-colors ${
-                selectedRange === r
-                  ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-white'
-                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-            >
-              {r}
-            </button>
-          ))}
+        <div className="flex">
+          <TimeFilter filter={timeFilter} onChange={setTimeFilter} />
         </div>
       </div>
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
         <StatCard
-          title={`${selectedRange.charAt(0).toUpperCase() + selectedRange.slice(1)}ly Total`}
+          title={`${timeFilter.range.charAt(0).toUpperCase() + timeFilter.range.slice(1)}ly Total`}
           value={summary ? `₹${summary.monthlyTotal.toLocaleString()}` : '...'}
           icon={<Wallet />}
           trend={summary ? { 
@@ -303,9 +353,26 @@ const IncomePage: React.FC = () => {
 
       <AddIncomeModal 
         isOpen={isAddModalOpen} 
-        onClose={() => setIsAddModalOpen(false)} 
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setEditData(null);
+        }} 
         onSuccess={() => {
           fetchAllData();
+        }}
+        initialData={editData}
+      />
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        title="Delete Income"
+        message="Are you sure you want to delete this income record? This action cannot be undone and will affect your total balances."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDelete}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setIncomeToDelete(null);
         }}
       />
     </div>

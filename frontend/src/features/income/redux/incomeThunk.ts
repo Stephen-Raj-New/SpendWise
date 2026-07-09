@@ -9,17 +9,17 @@ export const fetchIncomeList = createAsyncThunk<IncomeListResponse, any>(
   }
 );
 
-export const fetchIncomeSummary = createAsyncThunk<IncomeSummary, string>(
+export const fetchIncomeSummary = createAsyncThunk<IncomeSummary, any>(
   'income/fetchSummary',
-  async (range) => {
-    return await incomeService.getIncomeSummary(range);
+  async (query) => {
+    return await incomeService.getIncomeSummary(query);
   }
 );
 
-export const fetchSourceDistribution = createAsyncThunk<SourceDistribution[], string>(
+export const fetchSourceDistribution = createAsyncThunk<SourceDistribution[], any>(
   'income/fetchSourceDistribution',
-  async (range) => {
-    return await incomeService.getSourceDistribution(range);
+  async (query) => {
+    return await incomeService.getSourceDistribution(query);
   }
 );
 

@@ -14,12 +14,30 @@ export class ExpensesService {
     private notificationsGateway: NotificationsGateway,
   ) {}
 
-  private getDateRange(range: string): { $gte: Date; $lte: Date } {
-    const end = new Date();
-    const start = new Date();
-    if (range === 'year') start.setFullYear(start.getFullYear() - 1);
-    else if (range === 'quarter') start.setMonth(start.getMonth() - 3);
-    else start.setMonth(start.getMonth() - 1); // default month
+  private getDateRange(query: any): { $gte: Date; $lte: Date } {
+    if (typeof query === 'string') query = { range: query };
+    const { range = 'month', year, month, quarter } = query || {};
+    
+    let start, end;
+    
+    if (range === 'year' && year) {
+      start = new Date(Number(year), 0, 1);
+      end = new Date(Number(year), 11, 31, 23, 59, 59, 999);
+    } else if (range === 'month' && year && month) {
+      start = new Date(Number(year), Number(month) - 1, 1);
+      end = new Date(Number(year), Number(month), 0, 23, 59, 59, 999);
+    } else if (range === 'quarter' && year && quarter) {
+      const qStartMonth = (Number(quarter) - 1) * 3;
+      start = new Date(Number(year), qStartMonth, 1);
+      end = new Date(Number(year), qStartMonth + 3, 0, 23, 59, 59, 999);
+    } else {
+      end = new Date();
+      start = new Date();
+      if (range === 'year') start.setFullYear(start.getFullYear() - 1);
+      else if (range === 'quarter') start.setMonth(start.getMonth() - 3);
+      else start.setMonth(start.getMonth() - 1);
+    }
+    
     return { $gte: start, $lte: end };
   }
 
@@ -34,8 +52,8 @@ export class ExpensesService {
       filter.date = {};
       if (dateFrom) filter.date.$gte = new Date(dateFrom);
       if (dateTo) filter.date.$lte = new Date(dateTo);
-    } else if (range) {
-      filter.date = this.getDateRange(range);
+    } else if (query.range) {
+      filter.date = this.getDateRange(query);
     }
 
     const total = await this.expenseModel.countDocuments(filter);
@@ -55,9 +73,9 @@ export class ExpensesService {
     };
   }
 
-  async getSummary(userId: string, range: string) {
-    const dateRange = this.getDateRange(range);
-    const prevDateRange = this.getDateRange(range); // rough previous period
+  async getSummary(userId: string, query: any) {
+    const dateRange = this.getDateRange(query);
+    const prevDateRange = this.getDateRange(query); // rough previous period
     const diff = dateRange.$lte.getTime() - dateRange.$gte.getTime();
     prevDateRange.$gte = new Date(dateRange.$gte.getTime() - diff);
     prevDateRange.$lte = new Date(dateRange.$lte.getTime() - diff);
@@ -111,8 +129,8 @@ export class ExpensesService {
     };
   }
 
-  async getCategoryDistribution(userId: string, range: string) {
-    const dateRange = this.getDateRange(range);
+  async getCategoryDistribution(userId: string, query: any) {
+    const dateRange = this.getDateRange(query);
     
     const pipeline: any[] = [
       { $match: { userId: new Types.ObjectId(userId), date: dateRange } },

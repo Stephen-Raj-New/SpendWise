@@ -4,10 +4,10 @@ import { setLoading, setError, setBudgets } from './budgetSlice';
 
 export const fetchBudgets = createAsyncThunk(
   'budget/fetchBudgets',
-  async (month: string | undefined, { dispatch, rejectWithValue }) => {
+  async (query: any, { dispatch, rejectWithValue }) => {
     try {
       dispatch(setLoading(true));
-      const data = await budgetService.getBudgets(month);
+      const data = await budgetService.getBudgets(query);
       dispatch(setBudgets(data));
       return data;
     } catch (error: any) {

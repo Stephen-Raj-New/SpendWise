@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../store/store';
 import { logout } from '../features/auth/redux/authSlice';
 import { Navbar } from '../components/layout/Navbar';
+import { ConfirmModal } from '../components/ui/ConfirmModal';
 import { 
   LayoutDashboard, 
   Wallet, 
@@ -41,6 +42,8 @@ const DashboardLayout = () => {
     actionLabel?: string;
     onAction?: () => void;
   }>({});
+
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -101,7 +104,7 @@ const DashboardLayout = () => {
                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
           </div>
-          <nav className="flex-1 overflow-y-auto px-4 space-y-1 pb-4 scrollbar-thin">
+          <nav className="flex-1 overflow-y-auto px-4 space-y-1 pb-4 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300 dark:[&::-webkit-scrollbar-thumb]:bg-slate-600 [&::-webkit-scrollbar-track]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-slate-400">
             {links.map((link) => (
               <NavLink
                 key={link.to}
@@ -121,7 +124,7 @@ const DashboardLayout = () => {
           </nav>
           <div className="p-4 border-t border-slate-200 dark:border-slate-700">
             <button
-              onClick={handleLogout}
+              onClick={() => setIsLogoutModalOpen(true)}
               className="flex items-center space-x-3 px-3 py-2 w-full text-slate-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors dark:text-slate-400 dark:hover:bg-red-500/10 dark:hover:text-red-400"
             >
               <LogOut size={20} />
@@ -143,6 +146,16 @@ const DashboardLayout = () => {
           </main>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={isLogoutModalOpen}
+        title="Confirm Logout"
+        message="Are you sure you want to log out? You will need to sign in again to access your account."
+        confirmText="Log Out"
+        cancelText="Cancel"
+        onConfirm={handleLogout}
+        onClose={() => setIsLogoutModalOpen(false)}
+      />
     </LayoutContext.Provider>
   );
 };

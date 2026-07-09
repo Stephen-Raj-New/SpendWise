@@ -17,8 +17,8 @@ export interface SetBudgetPayload {
 }
 
 export const budgetService = {
-  getBudgets: async (month?: string) => {
-    const response = await httpClients.get<Budget[]>(UserEndpoints.budget.list, { params: { month } });
+  getBudgets: async (query?: any) => {
+    const response = await httpClients.get<Budget[]>(UserEndpoints.budget.list, { params: query });
     return response.data;
   },
 

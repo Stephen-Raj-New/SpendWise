@@ -18,7 +18,7 @@ export declare class IncomeController {
         limit: number;
         totalPages: number;
     }>;
-    getSummary(req: any, range?: string): Promise<{
+    getSummary(req: any, query: any): Promise<{
         monthlyTotal: any;
         monthlyTotalTrendPct: number;
         avgPerTransaction: number;
@@ -27,7 +27,7 @@ export declare class IncomeController {
             percentage: number;
         };
     }>;
-    getSourceDistribution(req: any, range?: string): Promise<{
+    getSourceDistribution(req: any, query: any): Promise<{
         source: any;
         amount: any;
         percentage: number;

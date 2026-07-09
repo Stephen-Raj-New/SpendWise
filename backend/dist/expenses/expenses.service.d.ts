@@ -21,7 +21,7 @@ export declare class ExpensesService {
         limit: number;
         totalPages: number;
     }>;
-    getSummary(userId: string, range: string): Promise<{
+    getSummary(userId: string, query: any): Promise<{
         monthlyTotal: any;
         monthlyTotalTrendPct: number;
         avgPerTransaction: number;
@@ -30,7 +30,7 @@ export declare class ExpensesService {
             percentage: number;
         };
     }>;
-    getCategoryDistribution(userId: string, range: string): Promise<{
+    getCategoryDistribution(userId: string, query: any): Promise<{
         category: any;
         amount: any;
         percentage: number;

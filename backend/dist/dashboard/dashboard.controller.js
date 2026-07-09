@@ -21,48 +21,50 @@ let DashboardController = class DashboardController {
     constructor(dashboardService) {
         this.dashboardService = dashboardService;
     }
-    async getSummary(req, period) {
+    async getSummary(req, query) {
         const userId = String(req.user?.sub || req.user?.userId || '');
-        return this.dashboardService.getSummary(userId, period);
+        return this.dashboardService.getSummary(userId, query);
     }
-    async getIncomeVsExpense(req) {
+    async getIncomeVsExpense(req, query) {
         const userId = String(req.user?.sub || req.user?.userId || '');
-        return this.dashboardService.getIncomeVsExpense(userId);
+        return this.dashboardService.getIncomeVsExpense(userId, query);
     }
-    async getSpendingByCategory(req) {
+    async getSpendingByCategory(req, query) {
         const userId = String(req.user?.sub || req.user?.userId || '');
-        return this.dashboardService.getSpendingByCategory(userId);
+        return this.dashboardService.getSpendingByCategory(userId, query);
     }
-    async getRecentTransactions(req, page = 1, limit = 5) {
+    async getRecentTransactions(req, page = 1, limit = 5, query) {
         const userId = String(req.user?.sub || req.user?.userId || '');
-        return this.dashboardService.getRecentTransactions(userId, Number(page), Number(limit));
+        return this.dashboardService.getRecentTransactions(userId, Number(page), Number(limit), query);
     }
-    async getBudgetProgress(req) {
+    async getBudgetProgress(req, query) {
         const userId = String(req.user?.sub || req.user?.userId || '');
-        return this.dashboardService.getBudgetProgress(userId);
+        return this.dashboardService.getBudgetProgress(userId, query);
     }
 };
 exports.DashboardController = DashboardController;
 __decorate([
     (0, common_1.Get)('summary'),
     __param(0, (0, common_1.Req)()),
-    __param(1, (0, common_1.Query)('period')),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getSummary", null);
 __decorate([
     (0, common_1.Get)('income-vs-expense'),
     __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getIncomeVsExpense", null);
 __decorate([
     (0, common_1.Get)('spending-by-category'),
     __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getSpendingByCategory", null);
 __decorate([
@@ -70,15 +72,17 @@ __decorate([
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Query)('page')),
     __param(2, (0, common_1.Query)('limit')),
+    __param(3, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:paramtypes", [Object, Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getRecentTransactions", null);
 __decorate([
     (0, common_1.Get)('budget-progress'),
     __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getBudgetProgress", null);
 exports.DashboardController = DashboardController = __decorate([

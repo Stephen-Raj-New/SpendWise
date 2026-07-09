@@ -29,15 +29,34 @@ let IncomeService = class IncomeService {
         this.categoryModel = categoryModel;
         this.notificationsGateway = notificationsGateway;
     }
-    getDateRange(range) {
-        const end = new Date();
-        const start = new Date();
-        if (range === 'year')
-            start.setFullYear(start.getFullYear() - 1);
-        else if (range === 'quarter')
-            start.setMonth(start.getMonth() - 3);
-        else
-            start.setMonth(start.getMonth() - 1);
+    getDateRange(query) {
+        if (typeof query === 'string')
+            query = { range: query };
+        const { range = 'month', year, month, quarter } = query || {};
+        let start, end;
+        if (range === 'year' && year) {
+            start = new Date(Number(year), 0, 1);
+            end = new Date(Number(year), 11, 31, 23, 59, 59, 999);
+        }
+        else if (range === 'month' && year && month) {
+            start = new Date(Number(year), Number(month) - 1, 1);
+            end = new Date(Number(year), Number(month), 0, 23, 59, 59, 999);
+        }
+        else if (range === 'quarter' && year && quarter) {
+            const qStartMonth = (Number(quarter) - 1) * 3;
+            start = new Date(Number(year), qStartMonth, 1);
+            end = new Date(Number(year), qStartMonth + 3, 0, 23, 59, 59, 999);
+        }
+        else {
+            end = new Date();
+            start = new Date();
+            if (range === 'year')
+                start.setFullYear(start.getFullYear() - 1);
+            else if (range === 'quarter')
+                start.setMonth(start.getMonth() - 3);
+            else
+                start.setMonth(start.getMonth() - 1);
+        }
         return { $gte: start, $lte: end };
     }
     async findAll(userId, query) {
@@ -56,8 +75,8 @@ let IncomeService = class IncomeService {
             if (dateTo)
                 filter.date.$lte = new Date(dateTo);
         }
-        else if (range) {
-            filter.date = this.getDateRange(range);
+        else if (query.range) {
+            filter.date = this.getDateRange(query);
         }
         const total = await this.incomeModel.countDocuments(filter);
         const data = await this.incomeModel
@@ -74,14 +93,14 @@ let IncomeService = class IncomeService {
             totalPages: Math.ceil(total / Number(limit)),
         };
     }
-    async getSummary(userId, range) {
-        const dateRange = this.getDateRange(range);
-        const prevDateRange = this.getDateRange(range);
+    async getSummary(userId, query) {
+        const dateRange = this.getDateRange(query);
+        const prevDateRange = this.getDateRange(query);
         const diff = dateRange.$lte.getTime() - dateRange.$gte.getTime();
         prevDateRange.$gte = new Date(dateRange.$gte.getTime() - diff);
         prevDateRange.$lte = new Date(dateRange.$lte.getTime() - diff);
-        const matchCurrent = { userId: new mongoose_2.Types.ObjectId(userId), date: dateRange };
-        const matchPrev = { userId: new mongoose_2.Types.ObjectId(userId), date: prevDateRange };
+        const matchCurrent = { userId: new mongoose_2.Types.ObjectId(userId), date: dateRange, status: 'Confirmed' };
+        const matchPrev = { userId: new mongoose_2.Types.ObjectId(userId), date: prevDateRange, status: 'Confirmed' };
         const [currentStats, prevStats, topSourceStats] = await Promise.all([
             this.incomeModel.aggregate([
                 { $match: matchCurrent },
@@ -123,10 +142,10 @@ let IncomeService = class IncomeService {
             topSource
         };
     }
-    async getSourceDistribution(userId, range) {
-        const dateRange = this.getDateRange(range);
+    async getSourceDistribution(userId, query) {
+        const dateRange = this.getDateRange(query);
         const pipeline = [
-            { $match: { userId: new mongoose_2.Types.ObjectId(userId), date: dateRange } },
+            { $match: { userId: new mongoose_2.Types.ObjectId(userId), date: dateRange, status: 'Confirmed' } },
             { $group: { _id: '$source', amount: { $sum: '$amount' } } },
             { $sort: { amount: -1 } }
         ];

@@ -7,6 +7,7 @@ import { AddCategoryModal } from './AddCategoryModal';
 import { ConfirmModal } from '../ui/ConfirmModal';
 import { Trash2, AlertCircle, TrendingUp, TrendingDown } from 'lucide-react';
 import { Badge } from '../ui/Badge';
+import toast from 'react-hot-toast';
 
 const CategoriesPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -37,9 +38,16 @@ const CategoriesPage: React.FC = () => {
 
   const handleConfirmDelete = async () => {
     if (categoryToDelete) {
-      await dispatch(deleteCategoryThunk(categoryToDelete));
-      dispatch(fetchCategories(filterType || undefined));
-      setCategoryToDelete(null);
+      try {
+        await dispatch(deleteCategoryThunk(categoryToDelete)).unwrap();
+        toast.success('Category deleted successfully');
+        dispatch(fetchCategories(filterType || undefined));
+      } catch (err: any) {
+        toast.error(err.message || 'Failed to delete category');
+      } finally {
+        setCategoryToDelete(null);
+        setDeleteModalOpen(false);
+      }
     }
   };
 
@@ -118,11 +126,13 @@ const CategoriesPage: React.FC = () => {
 
       <ConfirmModal
         isOpen={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
+        onCancel={() => setDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
         title="Delete Category"
         message="Are you sure you want to delete this category? This action cannot be undone."
-        confirmText="Delete"
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        variant="danger"
       />
     </div>
   );

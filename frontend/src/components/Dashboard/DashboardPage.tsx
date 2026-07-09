@@ -14,13 +14,20 @@ import { LineBarComboChart, DonutChart } from '../ui/Charts';
 import { DataTable } from '../ui/DataTable';
 import { ProgressBar } from '../ui/ProgressBar';
 import { InsightCard } from '../ui/InsightCard';
+import { TimeFilter } from '../ui/TimeFilter';
+import type { TimeFilterState } from '../ui/TimeFilter';
 import { Wallet, CreditCard, PiggyBank, IndianRupee } from 'lucide-react';
 import type { Transaction } from '../../features/dashboard/services/dashboardService';
 
 const DashboardPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { setNavbarProps } = useLayout();
-  const [period, setPeriod] = useState('this-month');
+  const [timeFilter, setTimeFilter] = useState<TimeFilterState>({
+    range: 'month',
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    quarter: Math.floor(new Date().getMonth() / 3) + 1,
+  });
 
   const {
     summary,
@@ -39,12 +46,12 @@ const DashboardPage: React.FC = () => {
   }, [setNavbarProps]);
 
   useEffect(() => {
-    dispatch(fetchDashboardSummary(period));
-    dispatch(fetchIncomeVsExpense());
-    dispatch(fetchSpendingByCategory());
-    dispatch(fetchRecentTransactions({ page: 1, limit: 5 }));
-    dispatch(fetchBudgetProgress());
-  }, [dispatch, period]);
+    dispatch(fetchDashboardSummary(timeFilter as any));
+    dispatch(fetchIncomeVsExpense(timeFilter as any));
+    dispatch(fetchSpendingByCategory(timeFilter as any));
+    dispatch(fetchRecentTransactions({ page: 1, limit: 5, query: timeFilter as any }));
+    dispatch(fetchBudgetProgress(timeFilter as any));
+  }, [dispatch, timeFilter]);
 
   const columns = [
     { header: 'Merchant', accessor: 'merchant' as keyof Transaction },
@@ -71,15 +78,9 @@ const DashboardPage: React.FC = () => {
           <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Dashboard</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Welcome back! Here's your financial overview.</p>
         </div>
-        <select
-          value={period}
-          onChange={(e) => setPeriod(e.target.value)}
-          className="w-full sm:w-auto appearance-none rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm outline-none hover:bg-slate-50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-        >
-          <option value="this-month">This Month</option>
-          <option value="last-month">Last Month</option>
-          <option value="this-year">This Year</option>
-        </select>
+        <div className="flex">
+          <TimeFilter filter={timeFilter} onChange={setTimeFilter} />
+        </div>
       </div>
 
       {/* Stats Row */}
@@ -116,6 +117,8 @@ const DashboardPage: React.FC = () => {
           <h3 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Income vs Expense</h3>
           {incomeVsExpense.loading ? (
             <div className="h-[300px] flex items-center justify-center text-slate-400">Loading chart...</div>
+          ) : incomeVsExpense.data.length === 0 ? (
+            <div className="h-[300px] flex items-center justify-center text-slate-400">No data available</div>
           ) : (
             <LineBarComboChart 
               data={incomeVsExpense.data} 
@@ -129,6 +132,8 @@ const DashboardPage: React.FC = () => {
           <h3 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Spending by Category</h3>
           {spendingByCategory.loading ? (
             <div className="h-[300px] flex items-center justify-center text-slate-400">Loading chart...</div>
+          ) : spendingByCategory.data.length === 0 ? (
+            <div className="h-[300px] flex items-center justify-center text-slate-400">No data available</div>
           ) : (
             <DonutChart 
               data={spendingByCategory.data} 
@@ -169,6 +174,8 @@ const DashboardPage: React.FC = () => {
             <h3 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Budget Progress</h3>
             {budgetProgress.loading ? (
               <div className="py-4 text-center text-slate-400">Loading budget...</div>
+            ) : budgetProgress.data.length === 0 ? (
+              <div className="py-4 text-center text-slate-400">No data available</div>
             ) : (
               <div className="space-y-5">
                 {budgetProgress.data.map((item) => (

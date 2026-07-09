@@ -16,6 +16,7 @@ import ReportsPage from './components/Reports/ReportsPage';
 import NotificationsPage from './components/Notifications/NotificationsPage';
 import SettingsPage from './components/Settings/SettingsPage';
 import { Card } from './components/ui/Card';
+import { Toaster } from 'react-hot-toast';
 
 // Placeholder Pages inside Card primitive
 const Placeholder = ({ title }: { title: string }) => (
@@ -71,6 +72,24 @@ const App = () => {
               <Route path="/admin/settings" element={<Placeholder title="Admin Settings" />} />
             </Route>
           </Routes>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              className: 'dark:bg-slate-800 dark:text-slate-100 bg-white/80 backdrop-blur-md text-slate-800 shadow-xl border border-slate-200/50 dark:border-slate-700/50 rounded-xl font-medium',
+              success: {
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
         </Router>
       </ThemeProvider>
     </Provider>

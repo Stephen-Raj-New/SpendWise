@@ -11,6 +11,14 @@ import {
 import type { Expense, ExpenseSummary, CategoryDistribution, ExpenseListResponse } from '../services/expenseService';
 
 interface ExpenseState {
+  filters: {
+    dateFrom?: string;
+    dateTo?: string;
+    range: string;
+    year?: number;
+    month?: number;
+    quarter?: number;
+  };
   summary: ExpenseSummary | null;
   distribution: CategoryDistribution[];
   list: ExpenseListResponse;

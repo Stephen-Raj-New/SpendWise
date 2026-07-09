@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Search, Sun, Moon, Bell, Plus, User as UserIcon, LogOut, Settings as SettingsIcon, Menu } from 'lucide-react';
+import { ConfirmModal } from '../ui/ConfirmModal';
 import { useTheme } from '../../contexts/ThemeContext';
 // ... (keeping imports intact via regex/replace carefully)
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,6 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const navigate = useNavigate();
   const role = useSelector((state: RootState) => state.auth.role);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -134,7 +136,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </button>
                   <div className="my-1 border-t border-slate-100 dark:border-slate-700" />
                   <button
-                    onClick={handleLogout}
+                    onClick={() => { setIsProfileOpen(false); setIsLogoutModalOpen(true); }}
                     className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10"
                   >
                     <LogOut size={16} className="mr-2" />
@@ -146,6 +148,15 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
         </div>
       </div>
+      <ConfirmModal
+        isOpen={isLogoutModalOpen}
+        title="Confirm Logout"
+        message="Are you sure you want to log out? You will need to sign in again to access your account."
+        confirmText="Log Out"
+        cancelText="Cancel"
+        onConfirm={handleLogout}
+        onClose={() => setIsLogoutModalOpen(false)}
+      />
     </header>
   );
 };

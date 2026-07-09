@@ -6,11 +6,15 @@ export declare class BudgetService {
     private budgetModel;
     private expenseModel;
     constructor(budgetModel: Model<Budget>, expenseModel: Model<Expense>);
-    getBudgets(userId: string, month: string): Promise<(Budget & Required<{
-        _id: Types.ObjectId;
-    }> & {
-        __v: number;
-    })[]>;
+    private getMonthRange;
+    getBudgets(userId: string, query: any): Promise<{
+        _id: any;
+        userId: any;
+        category: any;
+        limit: any;
+        month: any;
+        spent: any;
+    }[]>;
     setBudget(userId: string, dto: SetBudgetDto): Promise<import("mongoose").Document<unknown, {}, Budget, {}, import("mongoose").DefaultSchemaOptions> & Budget & Required<{
         _id: Types.ObjectId;
     }> & {

@@ -27,13 +27,13 @@ let ExpensesController = class ExpensesController {
         const userId = req.user?.sub || req.user?.userId;
         return this.expensesService.findAll(String(userId), query);
     }
-    getSummary(req, range = 'month') {
+    getSummary(req, query) {
         const userId = req.user?.sub || req.user?.userId;
-        return this.expensesService.getSummary(String(userId), range);
+        return this.expensesService.getSummary(String(userId), query);
     }
-    getCategoryDistribution(req, range = 'month') {
+    getCategoryDistribution(req, query) {
         const userId = req.user?.sub || req.user?.userId;
-        return this.expensesService.getCategoryDistribution(String(userId), range);
+        return this.expensesService.getCategoryDistribution(String(userId), query);
     }
     async exportCsv(req, query, res) {
         const userId = req.user?.sub || req.user?.userId;
@@ -67,17 +67,17 @@ __decorate([
 __decorate([
     (0, common_1.Get)('summary'),
     __param(0, (0, common_1.Request)()),
-    __param(1, (0, common_1.Query)('range')),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], ExpensesController.prototype, "getSummary", null);
 __decorate([
     (0, common_1.Get)('category-distribution'),
     __param(0, (0, common_1.Request)()),
-    __param(1, (0, common_1.Query)('range')),
+    __param(1, (0, common_1.Query)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", void 0)
 ], ExpensesController.prototype, "getCategoryDistribution", null);
 __decorate([

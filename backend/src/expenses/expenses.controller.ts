@@ -17,15 +17,15 @@ export class ExpensesController {
   }
 
   @Get('summary')
-  getSummary(@Request() req: any, @Query('range') range: string = 'month') {
+  getSummary(@Request() req: any, @Query() query: any) {
     const userId = req.user?.sub || req.user?.userId;
-    return this.expensesService.getSummary(String(userId), range);
+    return this.expensesService.getSummary(String(userId), query);
   }
 
   @Get('category-distribution')
-  getCategoryDistribution(@Request() req: any, @Query('range') range: string = 'month') {
+  getCategoryDistribution(@Request() req: any, @Query() query: any) {
     const userId = req.user?.sub || req.user?.userId;
-    return this.expensesService.getCategoryDistribution(String(userId), range);
+    return this.expensesService.getCategoryDistribution(String(userId), query);
   }
 
   @Get('export')

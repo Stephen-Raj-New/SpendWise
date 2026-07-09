@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setBudgetThunk } from '../../features/budget/redux/budgetThunk';
 import { fetchCategories, createCategoryThunk } from '../../features/categories/redux/categoryThunk';
 import { CreatableSelect } from '../ui/CreatableSelect';
+import toast from 'react-hot-toast';
 
 const budgetSchema = Yup.object().shape({
   category: Yup.string().required('Category is required'),
@@ -29,14 +30,8 @@ export const SetBudgetModal: React.FC<SetBudgetModalProps> = ({ isOpen, onClose,
     }
   }, [isOpen, dispatch]);
 
-  const handleCreateCategory = async (inputValue: string) => {
-    try {
-      const res = await dispatch(createCategoryThunk({ name: inputValue, type: 'expense', color: '#ef4444' })).unwrap();
-      formik.setFieldValue('category', res.name);
-      dispatch(fetchCategories('expense'));
-    } catch (err) {
-      console.error('Failed to create category', err);
-    }
+  const handleCreateCategory = (inputValue: string) => {
+    formik.setFieldValue('category', inputValue);
   };
   
   const formik = useFormik({
@@ -47,15 +42,26 @@ export const SetBudgetModal: React.FC<SetBudgetModalProps> = ({ isOpen, onClose,
     validationSchema: budgetSchema,
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       try {
+        let finalCategory = values.category;
+        
+        // Check if category is new
+        const exists = categories.find(c => c.name.toLowerCase() === finalCategory.toLowerCase());
+        if (!exists) {
+          const newCat = await dispatch(createCategoryThunk({ name: finalCategory, type: 'expense', color: '#ef4444' })).unwrap();
+          finalCategory = newCat.name;
+        }
+
         await dispatch(setBudgetThunk({ 
-          category: values.category, 
+          category: finalCategory, 
           limit: Number(values.limit),
           month: selectedMonth
         })).unwrap();
+        toast.success('Budget set successfully');
         resetForm();
         onSuccess();
         onClose();
-      } catch (err) {
+      } catch (err: any) {
+        toast.error(err.message || 'Failed to set budget');
         console.error('Failed to set budget:', err);
       } finally {
         setSubmitting(false);

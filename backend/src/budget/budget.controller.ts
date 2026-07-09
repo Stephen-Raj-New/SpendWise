@@ -9,10 +9,9 @@ export class BudgetController {
   constructor(private readonly budgetService: BudgetService) {}
 
   @Get()
-  async getBudgets(@Request() req: any, @Query('month') month: string) {
-    const currentMonth = month || `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+  async getBudgets(@Request() req: any, @Query() query: any) {
     const userId = req.user?.sub || req.user?.userId;
-    return this.budgetService.getBudgets(String(userId), currentMonth);
+    return this.budgetService.getBudgets(String(userId), query);
   }
 
   @Post()

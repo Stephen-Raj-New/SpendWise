@@ -1,12 +1,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { expenseService } from '../services/expenseService';
-import type { Expense } from '../services/expenseService';
+import type { Expense, ExpenseSummary, CategoryDistribution } from '../services/expenseService';
 
-export const fetchExpenseSummary = createAsyncThunk(
+export const fetchExpenseSummary = createAsyncThunk<ExpenseSummary, any>(
   'expenses/fetchSummary',
-  async (range: string, { rejectWithValue }) => {
+  async (query, { rejectWithValue }) => {
     try {
-      const data = await expenseService.getExpenseSummary(range);
+      const data = await expenseService.getExpenseSummary(query);
       return data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch summary');
@@ -14,11 +14,11 @@ export const fetchExpenseSummary = createAsyncThunk(
   }
 );
 
-export const fetchCategoryDistribution = createAsyncThunk(
+export const fetchCategoryDistribution = createAsyncThunk<CategoryDistribution[], any>(
   'expenses/fetchCategoryDistribution',
-  async (range: string, { rejectWithValue }) => {
+  async (query, { rejectWithValue }) => {
     try {
-      const data = await expenseService.getCategoryDistribution(range);
+      const data = await expenseService.getCategoryDistribution(query);
       return data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch distribution');

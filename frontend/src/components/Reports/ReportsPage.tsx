@@ -5,12 +5,19 @@ import { reportService, type SummaryReport } from '../../features/reports/servic
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { Download } from 'lucide-react';
 import { generatePDF } from '../../utils/generatePDF';
+import { TimeFilter } from '../ui/TimeFilter';
+import type { TimeFilterState } from '../ui/TimeFilter';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6'];
 
 const ReportsPage: React.FC = () => {
   const { setNavbarProps } = useLayout();
-  const [year, setYear] = useState<number>(new Date().getFullYear());
+  const [timeFilter, setTimeFilter] = useState<TimeFilterState>({
+    range: 'year',
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    quarter: Math.floor(new Date().getMonth() / 3) + 1,
+  });
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<SummaryReport | null>(null);
 
@@ -26,7 +33,7 @@ const ReportsPage: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const reportData = await reportService.getSummaryReport(year);
+        const reportData = await reportService.getSummaryReport(timeFilter);
         setData(reportData);
       } catch (err) {
         console.error('Failed to fetch report data', err);
@@ -35,7 +42,7 @@ const ReportsPage: React.FC = () => {
       }
     };
     fetchData();
-  }, [year]);
+  }, [timeFilter]);
 
   const handleExportPdf = () => {
     if (!data) return;
@@ -50,8 +57,8 @@ const ReportsPage: React.FC = () => {
     ]);
 
     generatePDF({
-      title: `Financial Report ${year}`,
-      filename: `report-${year}`,
+      title: `Financial Report`,
+      filename: `report-${timeFilter.range}-${timeFilter.year}`,
       headers: monthlyHeaders,
       data: monthlyPdfData
     });
@@ -65,16 +72,7 @@ const ReportsPage: React.FC = () => {
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Analyze your financial trends over time.</p>
         </div>
         <div className="flex items-center gap-4">
-          <select
-            value={year}
-            onChange={(e) => setYear(Number(e.target.value))}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-          >
-            {[...Array(5)].map((_, i) => {
-              const y = new Date().getFullYear() - i;
-              return <option key={y} value={y}>{y}</option>;
-            })}
-          </select>
+          <TimeFilter filter={timeFilter} onChange={setTimeFilter} />
           <button
             onClick={handleExportPdf}
             disabled={!data}
@@ -91,7 +89,7 @@ const ReportsPage: React.FC = () => {
       ) : data ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="lg:col-span-2">
-            <h3 className="mb-6 text-lg font-semibold text-slate-900 dark:text-slate-100">Income vs Expense ({year})</h3>
+            <h3 className="mb-6 text-lg font-semibold text-slate-900 dark:text-slate-100">Income vs Expense</h3>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.monthlyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -140,7 +138,7 @@ const ReportsPage: React.FC = () => {
               </div>
             ) : (
               <div className="flex h-80 items-center justify-center text-slate-500">
-                No expense data for {year}
+                No expense data for selected period
               </div>
             )}
           </Card>

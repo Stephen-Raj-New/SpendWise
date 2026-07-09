@@ -8,9 +8,8 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Get('summary')
-  async getSummaryReport(@Request() req: any, @Query('year') year: string) {
-    const reportYear = year ? parseInt(year, 10) : new Date().getFullYear();
+  async getSummaryReport(@Request() req: any, @Query() query: any) {
     const userId = req.user?.sub || req.user?.userId;
-    return this.reportsService.getSummaryReport(String(userId), reportYear);
+    return this.reportsService.getSummaryReport(String(userId), query);
   }
 }

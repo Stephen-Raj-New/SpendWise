@@ -4,6 +4,7 @@ import * as Yup from 'yup';
 import { Modal } from '../ui/Modal';
 import { useAppDispatch } from '../../store/hooks';
 import { createCategoryThunk } from '../../features/categories/redux/categoryThunk';
+import toast from 'react-hot-toast';
 
 const categorySchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
@@ -30,10 +31,12 @@ export const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onCl
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       try {
         await dispatch(createCategoryThunk(values)).unwrap();
+        toast.success('Category created successfully');
         resetForm();
         onSuccess();
         onClose();
-      } catch (err) {
+      } catch (err: any) {
+        toast.error(err.message || 'Failed to create category');
         console.error('Failed to create category:', err);
       } finally {
         setSubmitting(false);

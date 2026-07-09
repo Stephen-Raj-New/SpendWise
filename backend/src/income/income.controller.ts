@@ -17,15 +17,15 @@ export class IncomeController {
   }
 
   @Get('summary')
-  getSummary(@Request() req: any, @Query('range') range: string = 'month') {
+  getSummary(@Request() req: any, @Query() query: any) {
     const userId = req.user?.sub || req.user?.userId;
-    return this.incomeService.getSummary(String(userId), range);
+    return this.incomeService.getSummary(String(userId), query);
   }
 
   @Get('source-distribution')
-  getSourceDistribution(@Request() req: any, @Query('range') range: string = 'month') {
+  getSourceDistribution(@Request() req: any, @Query() query: any) {
     const userId = req.user?.sub || req.user?.userId;
-    return this.incomeService.getSourceDistribution(String(userId), range);
+    return this.incomeService.getSourceDistribution(String(userId), query);
   }
 
   @Get('export')

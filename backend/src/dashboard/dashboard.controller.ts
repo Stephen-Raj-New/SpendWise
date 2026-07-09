@@ -18,32 +18,32 @@ export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
   @Get('summary')
-  async getSummary(@Req() req: RequestWithUser, @Query('period') period?: string) {
+  async getSummary(@Req() req: RequestWithUser, @Query() query: any) {
     const userId = String(req.user?.sub || req.user?.userId || '');
-    return this.dashboardService.getSummary(userId, period);
+    return this.dashboardService.getSummary(userId, query);
   }
 
   @Get('income-vs-expense')
-  async getIncomeVsExpense(@Req() req: RequestWithUser) {
+  async getIncomeVsExpense(@Req() req: RequestWithUser, @Query() query: any) {
     const userId = String(req.user?.sub || req.user?.userId || '');
-    return this.dashboardService.getIncomeVsExpense(userId);
+    return this.dashboardService.getIncomeVsExpense(userId, query);
   }
 
   @Get('spending-by-category')
-  async getSpendingByCategory(@Req() req: RequestWithUser) {
+  async getSpendingByCategory(@Req() req: RequestWithUser, @Query() query: any) {
     const userId = String(req.user?.sub || req.user?.userId || '');
-    return this.dashboardService.getSpendingByCategory(userId);
+    return this.dashboardService.getSpendingByCategory(userId, query);
   }
 
   @Get('recent-transactions')
-  async getRecentTransactions(@Req() req: RequestWithUser, @Query('page') page = 1, @Query('limit') limit = 5) {
+  async getRecentTransactions(@Req() req: RequestWithUser, @Query('page') page = 1, @Query('limit') limit = 5, @Query() query: any) {
     const userId = String(req.user?.sub || req.user?.userId || '');
-    return this.dashboardService.getRecentTransactions(userId, Number(page), Number(limit));
+    return this.dashboardService.getRecentTransactions(userId, Number(page), Number(limit), query);
   }
 
   @Get('budget-progress')
-  async getBudgetProgress(@Req() req: RequestWithUser) {
+  async getBudgetProgress(@Req() req: RequestWithUser, @Query() query: any) {
     const userId = String(req.user?.sub || req.user?.userId || '');
-    return this.dashboardService.getBudgetProgress(userId);
+    return this.dashboardService.getBudgetProgress(userId, query);
   }
 }

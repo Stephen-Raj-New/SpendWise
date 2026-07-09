@@ -22,6 +22,9 @@ interface IncomeState {
     dateFrom?: string;
     dateTo?: string;
     range: string;
+    year?: number;
+    month?: number;
+    quarter?: number;
   };
   summary: IncomeSummary | null;
   sourceDistribution: SourceDistribution[];

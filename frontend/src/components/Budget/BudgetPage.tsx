@@ -7,6 +7,9 @@ import { ProgressBar } from '../ui/ProgressBar';
 import { SetBudgetModal } from './SetBudgetModal';
 import { ConfirmModal } from '../ui/ConfirmModal';
 import { Trash2, AlertCircle } from 'lucide-react';
+import { TimeFilter } from '../ui/TimeFilter';
+import type { TimeFilterState } from '../ui/TimeFilter';
+import toast from 'react-hot-toast';
 
 const BudgetPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -14,7 +17,12 @@ const BudgetPage: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [budgetToDelete, setBudgetToDelete] = useState<string | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState(`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`);
+  const [timeFilter, setTimeFilter] = useState<TimeFilterState>({
+    range: 'month',
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+    quarter: Math.floor(new Date().getMonth() / 3) + 1,
+  });
 
   const { list, loading } = useAppSelector((state) => state.budget);
 
@@ -27,8 +35,8 @@ const BudgetPage: React.FC = () => {
   }, [setNavbarProps]);
 
   useEffect(() => {
-    dispatch(fetchBudgets(selectedMonth));
-  }, [dispatch, selectedMonth]);
+    dispatch(fetchBudgets(timeFilter));
+  }, [dispatch, timeFilter]);
 
   const handleDeleteClick = (id: string) => {
     setBudgetToDelete(id);
@@ -37,9 +45,16 @@ const BudgetPage: React.FC = () => {
 
   const handleConfirmDelete = async () => {
     if (budgetToDelete) {
-      await dispatch(deleteBudgetThunk(budgetToDelete));
-      dispatch(fetchBudgets(selectedMonth));
-      setBudgetToDelete(null);
+      try {
+        await dispatch(deleteBudgetThunk(budgetToDelete)).unwrap();
+        toast.success('Budget deleted successfully');
+        dispatch(fetchBudgets(timeFilter));
+      } catch (err: any) {
+        toast.error(err.message || 'Failed to delete budget');
+      } finally {
+        setBudgetToDelete(null);
+        setDeleteModalOpen(false);
+      }
     }
   };
 
@@ -55,12 +70,7 @@ const BudgetPage: React.FC = () => {
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage your spending limits by category.</p>
         </div>
         <div>
-          <input 
-            type="month" 
-            value={selectedMonth} 
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 outline-none focus:border-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-          />
+          <TimeFilter filter={timeFilter} onChange={setTimeFilter} />
         </div>
       </div>
 
@@ -129,8 +139,8 @@ const BudgetPage: React.FC = () => {
       <SetBudgetModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        selectedMonth={selectedMonth}
-        onSuccess={() => dispatch(fetchBudgets(selectedMonth))}
+        selectedMonth={timeFilter.month ? `${timeFilter.year}-${String(timeFilter.month).padStart(2, '0')}` : `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`}
+        onSuccess={() => dispatch(fetchBudgets(timeFilter))}
       />
 
       <ConfirmModal
