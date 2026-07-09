@@ -9,4 +9,14 @@ export class AuthController {
   async login(@Body() loginDto: any) {
     return this.authService.login(loginDto);
   }
+
+  @Post('register')
+  async register(@Body() registerDto: any) {
+    return this.authService.register(registerDto);
+  }
+
+  @Post('verify-otp')
+  async verifyOtp(@Body() verifyOtpDto: any) {
+    return this.authService.verifyOtp(verifyOtpDto);
+  }
 }

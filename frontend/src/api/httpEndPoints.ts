@@ -1,6 +1,8 @@
 export const UserEndpoints = {
   auth: { 
     login: '/auth/login', 
+    register: '/auth/register',
+    verifyOtp: '/auth/verify-otp',
     refresh: '/auth/refresh', 
     logout: '/auth/logout' 
   },

@@ -4,5 +4,26 @@ export declare class AuthController {
     constructor(authService: AuthService);
     login(loginDto: any): Promise<{
         access_token: string;
+        user: {
+            id: import("mongoose").Types.ObjectId;
+            email: string;
+            fullName: string;
+            role: string;
+        };
+    }>;
+    register(registerDto: any): Promise<{
+        message: string;
+        userId: import("mongoose").Types.ObjectId;
+        email: string;
+        mockOtp: string;
+    }>;
+    verifyOtp(verifyOtpDto: any): Promise<{
+        access_token: string;
+        user: {
+            id: import("mongoose").Types.ObjectId;
+            email: string;
+            fullName: string;
+            role: string;
+        };
     }>;
 }

@@ -36,7 +36,7 @@ export declare const IncomeSchema: import("mongoose").Schema<Income, import("mon
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
         id: string;
     }>> | undefined;
-    userId?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, Income, Document<unknown, {}, Income, {
+    description?: import("mongoose").SchemaDefinitionProperty<string, Income, Document<unknown, {}, Income, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Income & Required<{
         _id: Types.ObjectId;
@@ -54,7 +54,7 @@ export declare const IncomeSchema: import("mongoose").Schema<Income, import("mon
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
         id: string;
     }>> | undefined;
-    description?: import("mongoose").SchemaDefinitionProperty<string, Income, Document<unknown, {}, Income, {
+    userId?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, Income, Document<unknown, {}, Income, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Income & Required<{
         _id: Types.ObjectId;

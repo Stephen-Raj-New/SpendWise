@@ -4,6 +4,8 @@ import { UserEndpoints, AdminEndpoints } from "./httpEndPoints";
 class Client {
   auth = {
     login: (data: any) => httpClients.post(UserEndpoints.auth.login, data),
+    register: (data: any) => httpClients.post(UserEndpoints.auth.register, data),
+    verifyOtp: (data: any) => httpClients.post(UserEndpoints.auth.verifyOtp, data),
     refresh: () => httpClients.post(UserEndpoints.auth.refresh),
     logout: () => httpClients.post(UserEndpoints.auth.logout),
   };

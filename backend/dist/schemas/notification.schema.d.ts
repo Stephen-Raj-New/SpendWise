@@ -33,15 +33,6 @@ export declare const NotificationSchema: import("mongoose").Schema<Notification,
     }, "id"> & import("mongoose").HydratedDocumentOverrides<{
         id: string;
     }>> | undefined;
-    userId?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, Notification, Document<unknown, {}, Notification, {
-        id: string;
-    }, import("mongoose").DefaultSchemaOptions> & Omit<Notification & Required<{
-        _id: Types.ObjectId;
-    }> & {
-        __v: number;
-    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
-        id: string;
-    }>> | undefined;
     message?: import("mongoose").SchemaDefinitionProperty<string, Notification, Document<unknown, {}, Notification, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Notification & Required<{
@@ -52,6 +43,15 @@ export declare const NotificationSchema: import("mongoose").Schema<Notification,
         id: string;
     }>> | undefined;
     read?: import("mongoose").SchemaDefinitionProperty<boolean, Notification, Document<unknown, {}, Notification, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<Notification & Required<{
+        _id: Types.ObjectId;
+    }> & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    userId?: import("mongoose").SchemaDefinitionProperty<Types.ObjectId, Notification, Document<unknown, {}, Notification, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<Notification & Required<{
         _id: Types.ObjectId;

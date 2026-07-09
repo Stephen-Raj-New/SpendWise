@@ -61,7 +61,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose,
           finalCategory = newCat.name;
         }
 
-        const payload = { ...values, category: finalCategory, amount: Number(values.amount) };
+        const payload = { ...values, category: finalCategory as any, amount: Number(values.amount) };
         
         if (initialData) {
           await dispatch(updateIncomeThunk({ id: initialData._id, payload })).unwrap();

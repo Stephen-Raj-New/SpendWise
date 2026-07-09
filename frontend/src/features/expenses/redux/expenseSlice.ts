@@ -32,6 +32,7 @@ const initialState: ExpenseState = {
   list: { data: [], total: 0, page: 1, limit: 10, totalPages: 0 },
   loading: false,
   error: null,
+  filters: {}
 };
 
 const expenseSlice = createSlice({

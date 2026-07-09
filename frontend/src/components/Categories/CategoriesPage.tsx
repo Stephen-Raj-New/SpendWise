@@ -126,12 +126,12 @@ const CategoriesPage: React.FC = () => {
 
       <ConfirmModal
         isOpen={deleteModalOpen}
-        onCancel={() => setDeleteModalOpen(false)}
+        onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
         title="Delete Category"
         message="Are you sure you want to delete this category? This action cannot be undone."
-        confirmLabel="Delete"
-        cancelLabel="Cancel"
+        confirmText="Delete"
+        cancelText="Cancel"
         variant="danger"
       />
     </div>

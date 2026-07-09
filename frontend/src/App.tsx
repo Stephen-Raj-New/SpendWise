@@ -4,6 +4,7 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './layouts/DashboardLayout';
 import DashboardPage from './components/Dashboard/DashboardPage';
@@ -35,6 +36,7 @@ const App = () => {
         <Router>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/" element={<Navigate to="/login" replace />} />
 
             {/* User Routes */}

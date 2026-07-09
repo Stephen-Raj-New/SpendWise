@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { setCredentials } from '../features/auth/redux/authSlice';
 import { loginService } from '../features/auth/services';
-const DEV_AUTOFILL = true;
+import toast from 'react-hot-toast';
+import { Eye, EyeOff } from 'lucide-react';
+
+const DEV_AUTOFILL = false;
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -14,6 +17,7 @@ const validationSchema = Yup.object().shape({
 
 const Login = () => {
   const [role, setRole] = useState<'user' | 'admin'>('user');
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -38,6 +42,8 @@ const Login = () => {
       
       dispatch(setCredentials({ token: access_token, role: responseRole }));
       import('../api/socket').then(({ connectSocket }) => connectSocket());
+
+      toast.success('Logged in successfully!');
 
       if (responseRole === 'admin') {
         navigate('/admin/dashboard');
@@ -103,11 +109,20 @@ const Login = () => {
 
               <div>
                 <label className="mb-1 block text-sm font-medium text-slate-700">Password</label>
-                <Field
-                  type="password"
-                  name="password"
-                  className="w-full rounded-md border border-slate-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                />
+                <div className="relative">
+                  <Field
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    className="w-full rounded-md border border-slate-300 px-3 py-2 pr-10 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
                 <ErrorMessage name="password" component="div" className="mt-1 text-xs text-red-500" />
               </div>
 
@@ -118,6 +133,13 @@ const Login = () => {
               >
                 {isSubmitting ? 'Logging in...' : 'Login'}
               </button>
+
+              <div className="mt-4 text-center text-sm text-slate-600">
+                Don't have an account?{' '}
+                <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+                  Register
+                </Link>
+              </div>
             </Form>
           )}
         </Formik>
