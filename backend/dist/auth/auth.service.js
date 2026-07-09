@@ -24,7 +24,7 @@ let AuthService = class AuthService {
         if (!isValidUser) {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
-        const payload = { sub: 1, email, role };
+        const payload = { sub: '507f1f77bcf86cd799439011', email, role };
         return {
             access_token: await this.jwtService.signAsync(payload),
         };

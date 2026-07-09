@@ -27,7 +27,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    setThemeState((prev: Theme) => {
+      const newTheme = prev === 'light' ? 'dark' : 'light';
+      localStorage.setItem('expensepro-theme', newTheme);
+      return newTheme;
+    });
   };
 
   useEffect(() => {

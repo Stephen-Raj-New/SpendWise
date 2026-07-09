@@ -8,7 +8,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NotificationsModule = void 0;
 const common_1 = require("@nestjs/common");
+const mongoose_1 = require("@nestjs/mongoose");
 const notifications_gateway_1 = require("./notifications.gateway");
+const notifications_service_1 = require("./notifications.service");
+const notifications_controller_1 = require("./notifications.controller");
+const notification_schema_1 = require("../schemas/notification.schema");
+const auth_module_1 = require("../auth/auth.module");
 const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
 let NotificationsModule = class NotificationsModule {
@@ -17,6 +22,8 @@ exports.NotificationsModule = NotificationsModule;
 exports.NotificationsModule = NotificationsModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            mongoose_1.MongooseModule.forFeature([{ name: notification_schema_1.Notification.name, schema: notification_schema_1.NotificationSchema }]),
+            auth_module_1.AuthModule,
             jwt_1.JwtModule.registerAsync({
                 imports: [config_1.ConfigModule],
                 useFactory: async (configService) => ({
@@ -25,8 +32,9 @@ exports.NotificationsModule = NotificationsModule = __decorate([
                 inject: [config_1.ConfigService],
             }),
         ],
-        providers: [notifications_gateway_1.NotificationsGateway],
-        exports: [notifications_gateway_1.NotificationsGateway],
+        controllers: [notifications_controller_1.NotificationsController],
+        providers: [notifications_gateway_1.NotificationsGateway, notifications_service_1.NotificationsService],
+        exports: [notifications_service_1.NotificationsService, notifications_gateway_1.NotificationsGateway],
     })
 ], NotificationsModule);
 //# sourceMappingURL=notifications.module.js.map

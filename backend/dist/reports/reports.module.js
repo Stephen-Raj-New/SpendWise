@@ -8,10 +8,27 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReportsModule = void 0;
 const common_1 = require("@nestjs/common");
+const mongoose_1 = require("@nestjs/mongoose");
+const reports_controller_1 = require("./reports.controller");
+const reports_service_1 = require("./reports.service");
+const income_schema_1 = require("../schemas/income.schema");
+const expense_schema_1 = require("../schemas/expense.schema");
+const auth_module_1 = require("../auth/auth.module");
 let ReportsModule = class ReportsModule {
 };
 exports.ReportsModule = ReportsModule;
 exports.ReportsModule = ReportsModule = __decorate([
-    (0, common_1.Module)({})
+    (0, common_1.Module)({
+        imports: [
+            mongoose_1.MongooseModule.forFeature([
+                { name: income_schema_1.Income.name, schema: income_schema_1.IncomeSchema },
+                { name: expense_schema_1.Expense.name, schema: expense_schema_1.ExpenseSchema }
+            ]),
+            auth_module_1.AuthModule,
+        ],
+        controllers: [reports_controller_1.ReportsController],
+        providers: [reports_service_1.ReportsService],
+        exports: [reports_service_1.ReportsService],
+    })
 ], ReportsModule);
 //# sourceMappingURL=reports.module.js.map

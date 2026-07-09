@@ -16,8 +16,9 @@ import { ProgressBar } from '../ui/ProgressBar';
 import { InsightCard } from '../ui/InsightCard';
 import { Badge } from '../ui/Badge';
 import { FilterBar } from '../ui/FilterBar';
-import { Wallet, TrendingUp, Award, Download } from 'lucide-react';
+import { Wallet, TrendingUp, Award, Download, FileText } from 'lucide-react';
 import { AddIncomeModal } from './AddIncomeModal';
+import { generatePDF } from '../../utils/generatePDF';
 
 const IncomePage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -63,6 +64,31 @@ const IncomePage: React.FC = () => {
       await incomeService.exportIncomeCsv(filters);
     } catch (err) {
       console.error('Failed to export CSV', err);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    try {
+      // Fetch unpaginated data for export
+      const response = await incomeService.getIncomeList({ ...filters, limit: 10000 });
+      
+      const headers = ['Date', 'Source', 'Category', 'Status', 'Amount'];
+      const pdfData = response.data.map(item => [
+        new Date(item.date).toLocaleDateString(),
+        item.source,
+        item.category,
+        item.status,
+        `₹${item.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+      ]);
+
+      generatePDF({
+        title: 'Income Report',
+        filename: 'income-export',
+        headers,
+        data: pdfData
+      });
+    } catch (err) {
+      console.error('Failed to export PDF', err);
     }
   };
 
@@ -183,13 +209,22 @@ const IncomePage: React.FC = () => {
             onFilterChange={(id, value) => dispatch(setFilters({ [id]: value }))}
             onClearFilters={() => dispatch(setFilters({ source: '' }))}
           />
-          <button
-            onClick={handleExportCsv}
-            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors"
-          >
-            <Download size={16} />
-            Export CSV
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleExportCsv}
+              className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors"
+            >
+              <Download size={16} />
+              CSV
+            </button>
+            <button
+              onClick={handleExportPdf}
+              className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700 transition-colors"
+            >
+              <FileText size={16} />
+              PDF
+            </button>
+          </div>
         </div>
 
         {loading.list ? (

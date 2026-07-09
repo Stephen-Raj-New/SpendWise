@@ -9,6 +9,7 @@ import { IncomeModule } from './income/income.module';
 import { ExpensesModule } from './expenses/expenses.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { BudgetModule } from './budget/budget.module';
+import { CategoriesModule } from './categories/categories.module';
 import { AdminModule } from './admin/admin.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ReportsModule } from './reports/reports.module';
@@ -30,7 +31,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     ExpensesModule,
     TransactionsModule,
     BudgetModule,
-    // CategoriesModule,
+    CategoriesModule,
     ReportsModule,
     NotificationsModule,
     AdminModule,

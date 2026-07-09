@@ -12,22 +12,26 @@ export class IncomeController {
 
   @Get()
   findAll(@Request() req: any, @Query() query: any) {
-    return this.incomeService.findAll(req.user.id, query);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.incomeService.findAll(String(userId), query);
   }
 
   @Get('summary')
   getSummary(@Request() req: any, @Query('range') range: string = 'month') {
-    return this.incomeService.getSummary(req.user.id, range);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.incomeService.getSummary(String(userId), range);
   }
 
   @Get('source-distribution')
   getSourceDistribution(@Request() req: any, @Query('range') range: string = 'month') {
-    return this.incomeService.getSourceDistribution(req.user.id, range);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.incomeService.getSourceDistribution(String(userId), range);
   }
 
   @Get('export')
   async exportCsv(@Request() req: any, @Query() query: any, @Res() res: Response) {
-    const csvData = await this.incomeService.exportCsv(req.user.id, query);
+    const userId = req.user?.sub || req.user?.userId;
+    const csvData = await this.incomeService.exportCsv(String(userId), query);
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename=income-export.csv');
     res.status(200).send(csvData);
@@ -35,16 +39,19 @@ export class IncomeController {
 
   @Post()
   create(@Request() req: any, @Body() createIncomeDto: CreateIncomeDto) {
-    return this.incomeService.create(req.user.id, createIncomeDto);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.incomeService.create(String(userId), createIncomeDto);
   }
 
   @Put(':id')
   update(@Request() req: any, @Param('id') id: string, @Body() updateIncomeDto: UpdateIncomeDto) {
-    return this.incomeService.update(req.user.id, id, updateIncomeDto);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.incomeService.update(String(userId), id, updateIncomeDto);
   }
 
   @Delete(':id')
   remove(@Request() req: any, @Param('id') id: string) {
-    return this.incomeService.remove(req.user.id, id);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.incomeService.remove(String(userId), id);
   }
 }

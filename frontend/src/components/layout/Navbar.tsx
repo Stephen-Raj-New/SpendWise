@@ -4,10 +4,8 @@ import { useTheme } from '../../contexts/ThemeContext';
 // ... (keeping imports intact via regex/replace carefully)
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../features/auth/redux/authSlice';
-import Client from '../../api';
 import type { RootState } from '../../store/store';
 import { useNavigate } from 'react-router-dom';
-import { cn } from '../../lib/utils';
 
 interface NavbarProps {
   searchPlaceholder?: string;

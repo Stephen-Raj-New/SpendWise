@@ -36,7 +36,8 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose,
     validationSchema: incomeSchema,
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       try {
-        await dispatch(createIncomeThunk(values as Partial<Income>)).unwrap();
+        const payload = { ...values, amount: Number(values.amount) };
+        await dispatch(createIncomeThunk(payload as Partial<Income>)).unwrap();
         resetForm();
         onSuccess();
         onClose();

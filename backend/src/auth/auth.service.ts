@@ -19,7 +19,8 @@ export class AuthService {
     }
 
     // Generate JWT
-    const payload = { sub: 1, email, role }; // `sub` should be the user's ObjectId from DB
+    // Use a valid 24-character hex string so MongoDB ObjectId casting works for all modules
+    const payload = { sub: '507f1f77bcf86cd799439011', email, role }; // `sub` should be the user's ObjectId from DB
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

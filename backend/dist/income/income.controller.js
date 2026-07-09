@@ -24,28 +24,35 @@ let IncomeController = class IncomeController {
         this.incomeService = incomeService;
     }
     findAll(req, query) {
-        return this.incomeService.findAll(req.user.id, query);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.incomeService.findAll(String(userId), query);
     }
     getSummary(req, range = 'month') {
-        return this.incomeService.getSummary(req.user.id, range);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.incomeService.getSummary(String(userId), range);
     }
     getSourceDistribution(req, range = 'month') {
-        return this.incomeService.getSourceDistribution(req.user.id, range);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.incomeService.getSourceDistribution(String(userId), range);
     }
     async exportCsv(req, query, res) {
-        const csvData = await this.incomeService.exportCsv(req.user.id, query);
+        const userId = req.user?.sub || req.user?.userId;
+        const csvData = await this.incomeService.exportCsv(String(userId), query);
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', 'attachment; filename=income-export.csv');
         res.status(200).send(csvData);
     }
     create(req, createIncomeDto) {
-        return this.incomeService.create(req.user.id, createIncomeDto);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.incomeService.create(String(userId), createIncomeDto);
     }
     update(req, id, updateIncomeDto) {
-        return this.incomeService.update(req.user.id, id, updateIncomeDto);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.incomeService.update(String(userId), id, updateIncomeDto);
     }
     remove(req, id) {
-        return this.incomeService.remove(req.user.id, id);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.incomeService.remove(String(userId), id);
     }
 };
 exports.IncomeController = IncomeController;

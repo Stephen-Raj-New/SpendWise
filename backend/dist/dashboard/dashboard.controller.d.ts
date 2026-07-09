@@ -14,26 +14,26 @@ export declare class DashboardController {
     getSummary(req: RequestWithUser, period?: string): Promise<{
         totalBalance: number;
         totalBalanceTrendPct: number;
-        income: number;
-        expenses: number;
+        income: any;
+        expenses: any;
         budgetGoal: number;
     }>;
     getIncomeVsExpense(req: RequestWithUser): Promise<{
         label: string;
-        income: number;
-        expense: number;
+        income: any;
+        expense: any;
     }[]>;
     getSpendingByCategory(req: RequestWithUser): Promise<{
-        category: string;
-        amount: number;
+        category: any;
+        amount: any;
         color: string;
     }[]>;
     getRecentTransactions(req: RequestWithUser, page?: number, limit?: number): Promise<{
         data: {
-            id: string;
+            id: import("mongoose").Types.ObjectId;
             merchant: string;
             category: string;
-            date: string;
+            date: Date;
             amount: number;
             type: string;
         }[];
@@ -43,7 +43,7 @@ export declare class DashboardController {
     }>;
     getBudgetProgress(req: RequestWithUser): Promise<{
         category: string;
-        spent: number;
+        spent: any;
         limit: number;
         status: string;
     }[]>;

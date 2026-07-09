@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Income } from '../schemas/income.schema';
 import { Expense } from '../schemas/expense.schema';
 import { Budget } from '../schemas/budget.schema';
@@ -9,29 +9,30 @@ export declare class DashboardService {
     private budgetModel;
     private categoryModel;
     constructor(incomeModel: Model<Income>, expenseModel: Model<Expense>, budgetModel: Model<Budget>, categoryModel: Model<Category>);
+    private getMonthRange;
     getSummary(userId: string, period?: string): Promise<{
         totalBalance: number;
         totalBalanceTrendPct: number;
-        income: number;
-        expenses: number;
+        income: any;
+        expenses: any;
         budgetGoal: number;
     }>;
     getIncomeVsExpense(userId: string): Promise<{
         label: string;
-        income: number;
-        expense: number;
+        income: any;
+        expense: any;
     }[]>;
     getSpendingByCategory(userId: string): Promise<{
-        category: string;
-        amount: number;
+        category: any;
+        amount: any;
         color: string;
     }[]>;
     getRecentTransactions(userId: string, page: number, limit: number): Promise<{
         data: {
-            id: string;
+            id: Types.ObjectId;
             merchant: string;
             category: string;
-            date: string;
+            date: Date;
             amount: number;
             type: string;
         }[];
@@ -41,7 +42,7 @@ export declare class DashboardService {
     }>;
     getBudgetProgress(userId: string): Promise<{
         category: string;
-        spent: number;
+        spent: any;
         limit: number;
         status: string;
     }[]>;

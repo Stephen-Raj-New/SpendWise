@@ -1,9 +1,8 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../store/store';
 import { logout } from '../features/auth/redux/authSlice';
-import Client from '../api';
 import { Navbar } from '../components/layout/Navbar';
 import { 
   LayoutDashboard, 
@@ -137,7 +136,7 @@ const DashboardLayout = () => {
           <Navbar {...navbarProps} onMenuClick={() => setIsSidebarOpen(true)} />
           
           {/* Scrollable Content with padding for navbar */}
-          <main className="flex-1 pt-16 p-4 sm:p-6 lg:p-8 overflow-x-hidden w-full max-w-[100vw]">
+          <main className="flex-1 pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 overflow-x-hidden w-full max-w-[100vw]">
             <div className="mx-auto max-w-7xl w-full">
               <Outlet />
             </div>
