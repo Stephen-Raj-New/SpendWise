@@ -24,13 +24,16 @@ let BudgetController = class BudgetController {
     }
     async getBudgets(req, month) {
         const currentMonth = month || `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
-        return this.budgetService.getBudgets(req.user.userId, currentMonth);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.budgetService.getBudgets(String(userId), currentMonth);
     }
     async setBudget(req, setBudgetDto) {
-        return this.budgetService.setBudget(req.user.userId, setBudgetDto);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.budgetService.setBudget(String(userId), setBudgetDto);
     }
     async deleteBudget(req, id) {
-        return this.budgetService.deleteBudget(req.user.userId, id);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.budgetService.deleteBudget(String(userId), id);
     }
 };
 exports.BudgetController = BudgetController;

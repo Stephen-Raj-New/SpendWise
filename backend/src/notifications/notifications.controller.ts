@@ -9,16 +9,19 @@ export class NotificationsController {
 
   @Get()
   async getNotifications(@Request() req: any) {
-    return this.notificationsService.getNotifications(req.user.userId);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.notificationsService.getNotifications(String(userId));
   }
 
   @Patch('read-all')
   async markAllAsRead(@Request() req: any) {
-    return this.notificationsService.markAllAsRead(req.user.userId);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.notificationsService.markAllAsRead(String(userId));
   }
 
   @Patch(':id/read')
   async markAsRead(@Request() req: any, @Param('id') id: string) {
-    return this.notificationsService.markAsRead(req.user.userId, id);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.notificationsService.markAsRead(String(userId), id);
   }
 }

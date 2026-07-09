@@ -12,7 +12,7 @@ export class Income extends Document {
   @Prop()
   description: string;
 
-  @Prop({ required: true, enum: ['Service Revenue', 'Product Sales', 'Consulting', 'Other'] })
+  @Prop({ required: true })
   category: string;
 
   @Prop({ required: true })

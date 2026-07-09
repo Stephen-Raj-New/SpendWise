@@ -8,9 +8,14 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { AuthModule } from '../auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 
+import { Category, CategorySchema } from '../schemas/category.schema';
+
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Income.name, schema: IncomeSchema }]),
+    MongooseModule.forFeature([
+      { name: Income.name, schema: IncomeSchema },
+      { name: Category.name, schema: CategorySchema }
+    ]),
     NotificationsModule,
     AuthModule,
     ConfigModule,

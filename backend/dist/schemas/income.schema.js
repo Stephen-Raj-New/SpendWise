@@ -36,7 +36,7 @@ __decorate([
     __metadata("design:type", String)
 ], Income.prototype, "description", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, enum: ['Service Revenue', 'Product Sales', 'Consulting', 'Other'] }),
+    (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
 ], Income.prototype, "category", void 0);
 __decorate([

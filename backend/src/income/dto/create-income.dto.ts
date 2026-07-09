@@ -9,7 +9,7 @@ export class CreateIncomeDto {
   @IsOptional()
   description?: string;
 
-  @IsEnum(['Service Revenue', 'Product Sales', 'Consulting', 'Other'])
+  @IsString()
   @IsNotEmpty()
   category: string;
 

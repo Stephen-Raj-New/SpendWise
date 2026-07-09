@@ -1,12 +1,14 @@
 import { Model, Types } from 'mongoose';
 import { Income } from '../schemas/income.schema';
+import { Category } from '../schemas/category.schema';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
 export declare class IncomeService {
     private incomeModel;
+    private categoryModel;
     private notificationsGateway;
-    constructor(incomeModel: Model<Income>, notificationsGateway: NotificationsGateway);
+    constructor(incomeModel: Model<Income>, categoryModel: Model<Category>, notificationsGateway: NotificationsGateway);
     private getDateRange;
     findAll(userId: string, query: any): Promise<{
         data: (import("mongoose").Document<unknown, {}, Income, {}, import("mongoose").DefaultSchemaOptions> & Income & Required<{

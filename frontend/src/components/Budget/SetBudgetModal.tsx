@@ -2,8 +2,10 @@ import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Modal } from '../ui/Modal';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setBudgetThunk } from '../../features/budget/redux/budgetThunk';
+import { fetchCategories, createCategoryThunk } from '../../features/categories/redux/categoryThunk';
+import { CreatableSelect } from '../ui/CreatableSelect';
 
 const budgetSchema = Yup.object().shape({
   category: Yup.string().required('Category is required'),
@@ -19,6 +21,23 @@ interface SetBudgetModalProps {
 
 export const SetBudgetModal: React.FC<SetBudgetModalProps> = ({ isOpen, onClose, onSuccess, selectedMonth }) => {
   const dispatch = useAppDispatch();
+  const categories = useAppSelector(state => state.category.list.filter(c => c.type === 'expense'));
+
+  React.useEffect(() => {
+    if (isOpen) {
+      dispatch(fetchCategories('expense'));
+    }
+  }, [isOpen, dispatch]);
+
+  const handleCreateCategory = async (inputValue: string) => {
+    try {
+      const res = await dispatch(createCategoryThunk({ name: inputValue, type: 'expense', color: '#ef4444' })).unwrap();
+      formik.setFieldValue('category', res.name);
+      dispatch(fetchCategories('expense'));
+    } catch (err) {
+      console.error('Failed to create category', err);
+    }
+  };
   
   const formik = useFormik({
     initialValues: {
@@ -49,18 +68,16 @@ export const SetBudgetModal: React.FC<SetBudgetModalProps> = ({ isOpen, onClose,
       <form onSubmit={formik.handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Category</label>
-          <input
+          <CreatableSelect
             name="category"
+            options={categories.map(c => ({ label: c.name, value: c.name }))}
             value={formik.values.category}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            type="text"
-            placeholder="e.g. Food, Housing, Transport"
-            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
+            onChange={(val) => formik.setFieldValue('category', val)}
+            onCreateOption={handleCreateCategory}
+            placeholder="Select or add category..."
+            error={formik.touched.category && formik.errors.category ? formik.errors.category as string : undefined}
+            onBlur={() => formik.setFieldTouched('category', true)}
           />
-          {formik.touched.category && formik.errors.category && (
-            <p className="mt-1 text-xs text-red-500">{formik.errors.category}</p>
-          )}
         </div>
 
         <div>

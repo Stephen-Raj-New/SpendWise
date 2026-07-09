@@ -22,13 +22,16 @@ let NotificationsController = class NotificationsController {
         this.notificationsService = notificationsService;
     }
     async getNotifications(req) {
-        return this.notificationsService.getNotifications(req.user.userId);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.notificationsService.getNotifications(String(userId));
     }
     async markAllAsRead(req) {
-        return this.notificationsService.markAllAsRead(req.user.userId);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.notificationsService.markAllAsRead(String(userId));
     }
     async markAsRead(req, id) {
-        return this.notificationsService.markAsRead(req.user.userId, id);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.notificationsService.markAsRead(String(userId), id);
     }
 };
 exports.NotificationsController = NotificationsController;

@@ -2,8 +2,10 @@ import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Modal } from '../ui/Modal';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { createExpense } from '../../features/expenses/redux/expenseThunk';
+import { fetchCategories, createCategoryThunk } from '../../features/categories/redux/categoryThunk';
+import { CreatableSelect } from '../ui/CreatableSelect';
 import type { Expense } from '../../features/expenses/services/expenseService';
 
 const expenseSchema = Yup.object().shape({
@@ -21,11 +23,29 @@ interface AddExpenseModalProps {
 
 export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const dispatch = useAppDispatch();
+  const categories = useAppSelector(state => state.category.list.filter(c => c.type === 'expense'));
+  console.log("expense category", categories)
+
+  React.useEffect(() => {
+    if (isOpen) {
+      dispatch(fetchCategories('expense'));
+    }
+  }, [isOpen, dispatch]);
+
+  const handleCreateCategory = async (inputValue: string) => {
+    try {
+      const res = await dispatch(createCategoryThunk({ name: inputValue, type: 'expense', color: '#ef4444' })).unwrap();
+      formik.setFieldValue('category', res.name);
+      dispatch(fetchCategories('expense'));
+    } catch (err) {
+      console.error('Failed to create category', err);
+    }
+  };
   
   const formik = useFormik({
     initialValues: {
       merchant: '',
-      category: 'Food',
+      category: '',
       amount: '' as unknown as number,
       date: new Date().toISOString().split('T')[0],
     },
@@ -66,23 +86,16 @@ export const AddExpenseModal: React.FC<AddExpenseModalProps> = ({ isOpen, onClos
 
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Category</label>
-          <select
+          <CreatableSelect
             name="category"
+            options={categories.map(c => ({ label: c.name, value: c.name }))}
             value={formik.values.category}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-          >
-            <option value="Food">Food</option>
-            <option value="Housing">Housing</option>
-            <option value="Transport">Transport</option>
-            <option value="Utilities">Utilities</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Other">Other</option>
-          </select>
-          {formik.touched.category && formik.errors.category && (
-            <p className="mt-1 text-xs text-red-500">{formik.errors.category}</p>
-          )}
+            onChange={(val) => formik.setFieldValue('category', val)}
+            onCreateOption={handleCreateCategory}
+            placeholder="Select or add category..."
+            error={formik.touched.category && formik.errors.category ? formik.errors.category as string : undefined}
+            onBlur={() => formik.setFieldTouched('category', true)}
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-4">

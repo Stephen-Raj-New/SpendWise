@@ -10,6 +10,7 @@ export class ReportsController {
   @Get('summary')
   async getSummaryReport(@Request() req: any, @Query('year') year: string) {
     const reportYear = year ? parseInt(year, 10) : new Date().getFullYear();
-    return this.reportsService.getSummaryReport(req.user.userId, reportYear);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.reportsService.getSummaryReport(String(userId), reportYear);
   }
 }

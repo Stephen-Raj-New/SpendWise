@@ -4,6 +4,7 @@ import { fetchCategories, deleteCategoryThunk } from '../../features/categories/
 import { useLayout } from '../../layouts/DashboardLayout';
 import { Card } from '../ui/Card';
 import { AddCategoryModal } from './AddCategoryModal';
+import { ConfirmModal } from '../ui/ConfirmModal';
 import { Trash2, AlertCircle, TrendingUp, TrendingDown } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 
@@ -11,6 +12,8 @@ const CategoriesPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { setNavbarProps } = useLayout();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<string>('');
 
   const { list, loading } = useAppSelector((state) => state.category);
@@ -27,10 +30,16 @@ const CategoriesPage: React.FC = () => {
     dispatch(fetchCategories(filterType || undefined));
   }, [dispatch, filterType]);
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
-      await dispatch(deleteCategoryThunk(id));
+  const handleDeleteClick = (id: string) => {
+    setCategoryToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (categoryToDelete) {
+      await dispatch(deleteCategoryThunk(categoryToDelete));
       dispatch(fetchCategories(filterType || undefined));
+      setCategoryToDelete(null);
     }
   };
 
@@ -91,7 +100,7 @@ const CategoriesPage: React.FC = () => {
                 </div>
               </div>
               <button 
-                onClick={() => handleDelete(category._id)}
+                onClick={() => handleDeleteClick(category._id)}
                 className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors"
               >
                 <Trash2 size={16} />
@@ -105,6 +114,15 @@ const CategoriesPage: React.FC = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={() => dispatch(fetchCategories(filterType || undefined))}
+      />
+
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Category"
+        message="Are you sure you want to delete this category? This action cannot be undone."
+        confirmText="Delete"
       />
     </div>
   );

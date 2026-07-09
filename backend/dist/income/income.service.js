@@ -17,13 +17,16 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const income_schema_1 = require("../schemas/income.schema");
+const category_schema_1 = require("../schemas/category.schema");
 const notifications_gateway_1 = require("../notifications/notifications.gateway");
 const csv_writer_1 = require("csv-writer");
 let IncomeService = class IncomeService {
     incomeModel;
+    categoryModel;
     notificationsGateway;
-    constructor(incomeModel, notificationsGateway) {
+    constructor(incomeModel, categoryModel, notificationsGateway) {
         this.incomeModel = incomeModel;
+        this.categoryModel = categoryModel;
         this.notificationsGateway = notificationsGateway;
     }
     getDateRange(range) {
@@ -136,9 +139,19 @@ let IncomeService = class IncomeService {
         }));
     }
     async create(userId, createIncomeDto) {
+        const uid = new mongoose_2.Types.ObjectId(userId);
+        const existingCategory = await this.categoryModel.findOne({ userId: uid, name: new RegExp(`^${createIncomeDto.category}$`, 'i'), type: 'income' });
+        if (!existingCategory) {
+            await new this.categoryModel({
+                userId: uid,
+                name: createIncomeDto.category,
+                color: '#10b981',
+                type: 'income'
+            }).save();
+        }
         const newIncome = new this.incomeModel({
             ...createIncomeDto,
-            userId: new mongoose_2.Types.ObjectId(userId)
+            userId: uid
         });
         const saved = await newIncome.save();
         this.notificationsGateway.sendNotificationToUser(userId, {
@@ -194,7 +207,9 @@ exports.IncomeService = IncomeService;
 exports.IncomeService = IncomeService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(income_schema_1.Income.name)),
+    __param(1, (0, mongoose_1.InjectModel)(category_schema_1.Category.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
+        mongoose_2.Model,
         notifications_gateway_1.NotificationsGateway])
 ], IncomeService);
 //# sourceMappingURL=income.service.js.map

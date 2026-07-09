@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Income } from '../schemas/income.schema';
+import { Category } from '../schemas/category.schema';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
 import { NotificationsGateway } from '../notifications/notifications.gateway';
@@ -11,6 +12,7 @@ import { createObjectCsvStringifier } from 'csv-writer';
 export class IncomeService {
   constructor(
     @InjectModel(Income.name) private incomeModel: Model<Income>,
+    @InjectModel(Category.name) private categoryModel: Model<Category>,
     private notificationsGateway: NotificationsGateway,
   ) {}
 
@@ -132,9 +134,22 @@ export class IncomeService {
   }
 
   async create(userId: string, createIncomeDto: CreateIncomeDto) {
+    const uid = new Types.ObjectId(userId);
+    
+    // Auto-create category if it doesn't exist
+    const existingCategory = await this.categoryModel.findOne({ userId: uid, name: new RegExp(`^${createIncomeDto.category}$`, 'i'), type: 'income' });
+    if (!existingCategory) {
+      await new this.categoryModel({
+        userId: uid,
+        name: createIncomeDto.category,
+        color: '#10b981', // green for income
+        type: 'income'
+      }).save();
+    }
+
     const newIncome = new this.incomeModel({
       ...createIncomeDto,
-      userId: new Types.ObjectId(userId)
+      userId: uid
     });
     
     const saved = await newIncome.save();

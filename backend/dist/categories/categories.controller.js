@@ -23,13 +23,16 @@ let CategoriesController = class CategoriesController {
         this.categoriesService = categoriesService;
     }
     async getCategories(req, type) {
-        return this.categoriesService.getCategories(req.user.userId, type);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.categoriesService.getCategories(String(userId), type);
     }
     async createCategory(req, createCategoryDto) {
-        return this.categoriesService.createCategory(req.user.userId, createCategoryDto);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.categoriesService.createCategory(String(userId), createCategoryDto);
     }
     async deleteCategory(req, id) {
-        return this.categoriesService.deleteCategory(req.user.userId, id);
+        const userId = req.user?.sub || req.user?.userId;
+        return this.categoriesService.deleteCategory(String(userId), id);
     }
 };
 exports.CategoriesController = CategoriesController;

@@ -2,14 +2,16 @@ import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { Modal } from '../ui/Modal';
-import { useAppDispatch } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { createIncomeThunk } from '../../features/income/redux/incomeThunk';
+import { fetchCategories, createCategoryThunk } from '../../features/categories/redux/categoryThunk';
+import { CreatableSelect } from '../ui/CreatableSelect';
 import type { Income } from '../../features/income/services/incomeService';
 
 const incomeSchema = Yup.object().shape({
   source: Yup.string().required('Source is required'),
   description: Yup.string(),
-  category: Yup.string().oneOf(['Service Revenue', 'Product Sales', 'Consulting', 'Other']).required('Category is required'),
+  category: Yup.string().required('Category is required'),
   amount: Yup.number().positive('Amount must be greater than 0').required('Amount is required'),
   date: Yup.string().required('Date is required'),
   status: Yup.string().oneOf(['Confirmed', 'Processing', 'Failed']).required('Status is required'),
@@ -23,12 +25,29 @@ interface AddIncomeModalProps {
 
 export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const dispatch = useAppDispatch();
+  const categories = useAppSelector(state => state.category.list.filter(c => c.type === 'income'));
+
+  React.useEffect(() => {
+    if (isOpen) {
+      dispatch(fetchCategories('income'));
+    }
+  }, [isOpen, dispatch]);
+
+  const handleCreateCategory = async (inputValue: string) => {
+    try {
+      const res = await dispatch(createCategoryThunk({ name: inputValue, type: 'income', color: '#10b981' })).unwrap();
+      formik.setFieldValue('category', res.name);
+      dispatch(fetchCategories('income'));
+    } catch (err) {
+      console.error('Failed to create category', err);
+    }
+  };
   
   const formik = useFormik({
     initialValues: {
       source: '',
       description: '',
-      category: 'Service Revenue',
+      category: '',
       status: 'Confirmed',
       amount: '' as unknown as number, // Let it be empty initially but treat as number
       date: new Date().toISOString().split('T')[0],
@@ -38,6 +57,7 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose,
       try {
         const payload = { ...values, amount: Number(values.amount) };
         await dispatch(createIncomeThunk(payload as Partial<Income>)).unwrap();
+        console.log("income", payload)
         resetForm();
         onSuccess();
         onClose();
@@ -84,21 +104,16 @@ export const AddIncomeModal: React.FC<AddIncomeModalProps> = ({ isOpen, onClose,
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Category</label>
-            <select
+            <CreatableSelect
               name="category"
+              options={categories.map(c => ({ label: c.name, value: c.name }))}
               value={formik.values.category}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-700 dark:text-white"
-            >
-              <option value="Service Revenue">Service Revenue</option>
-              <option value="Product Sales">Product Sales</option>
-              <option value="Consulting">Consulting</option>
-              <option value="Other">Other</option>
-            </select>
-            {formik.touched.category && formik.errors.category && (
-              <p className="mt-1 text-xs text-red-500">{formik.errors.category}</p>
-            )}
+              onChange={(val) => formik.setFieldValue('category', val)}
+              onCreateOption={handleCreateCategory}
+              placeholder="e.g. Service Revenue"
+              error={formik.touched.category && formik.errors.category ? formik.errors.category as string : undefined}
+              onBlur={() => formik.setFieldTouched('category', true)}
+            />
           </div>
 
           <div>

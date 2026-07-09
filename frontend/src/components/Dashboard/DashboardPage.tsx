@@ -14,7 +14,7 @@ import { LineBarComboChart, DonutChart } from '../ui/Charts';
 import { DataTable } from '../ui/DataTable';
 import { ProgressBar } from '../ui/ProgressBar';
 import { InsightCard } from '../ui/InsightCard';
-import { Wallet, CreditCard, PiggyBank, DollarSign } from 'lucide-react';
+import { Wallet, CreditCard, PiggyBank, IndianRupee } from 'lucide-react';
 import type { Transaction } from '../../features/dashboard/services/dashboardService';
 
 const DashboardPage: React.FC = () => {
@@ -86,25 +86,25 @@ const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Balance"
-          value={summary.data ? `$${summary.data.totalBalance.toLocaleString()}` : '...'}
-          icon={<DollarSign />}
+          value={summary.data ? `₹${summary.data.totalBalance.toLocaleString()}` : '...'}
+          icon={<IndianRupee />}
           trend={summary.data ? { value: summary.data.totalBalanceTrendPct, label: 'vs last month', isPositive: summary.data.totalBalanceTrendPct >= 0 } : undefined}
         />
         <StatCard
           title="Total Income"
-          value={summary.data ? `$${summary.data.income.toLocaleString()}` : '...'}
+          value={summary.data ? `₹${summary.data.income.toLocaleString()}` : '...'}
           icon={<Wallet />}
           className="border-l-4 border-emerald-500"
         />
         <StatCard
           title="Total Expenses"
-          value={summary.data ? `$${summary.data.expenses.toLocaleString()}` : '...'}
+          value={summary.data ? `₹${summary.data.expenses.toLocaleString()}` : '...'}
           icon={<CreditCard />}
           className="border-l-4 border-red-500"
         />
         <StatCard
           title="Budget Goal"
-          value={summary.data ? `$${summary.data.budgetGoal.toLocaleString()}` : '...'}
+          value={summary.data ? `₹${summary.data.budgetGoal.toLocaleString()}` : '...'}
           icon={<PiggyBank />}
           className="border-l-4 border-blue-500"
         />

@@ -11,16 +11,19 @@ export class BudgetController {
   @Get()
   async getBudgets(@Request() req: any, @Query('month') month: string) {
     const currentMonth = month || `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
-    return this.budgetService.getBudgets(req.user.userId, currentMonth);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.budgetService.getBudgets(String(userId), currentMonth);
   }
 
   @Post()
   async setBudget(@Request() req: any, @Body() setBudgetDto: SetBudgetDto) {
-    return this.budgetService.setBudget(req.user.userId, setBudgetDto);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.budgetService.setBudget(String(userId), setBudgetDto);
   }
 
   @Delete(':id')
   async deleteBudget(@Request() req: any, @Param('id') id: string) {
-    return this.budgetService.deleteBudget(req.user.userId, id);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.budgetService.deleteBudget(String(userId), id);
   }
 }

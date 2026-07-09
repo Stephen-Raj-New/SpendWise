@@ -15,13 +15,17 @@ const income_schema_1 = require("../schemas/income.schema");
 const notifications_module_1 = require("../notifications/notifications.module");
 const auth_module_1 = require("../auth/auth.module");
 const config_1 = require("@nestjs/config");
+const category_schema_1 = require("../schemas/category.schema");
 let IncomeModule = class IncomeModule {
 };
 exports.IncomeModule = IncomeModule;
 exports.IncomeModule = IncomeModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forFeature([{ name: income_schema_1.Income.name, schema: income_schema_1.IncomeSchema }]),
+            mongoose_1.MongooseModule.forFeature([
+                { name: income_schema_1.Income.name, schema: income_schema_1.IncomeSchema },
+                { name: category_schema_1.Category.name, schema: category_schema_1.CategorySchema }
+            ]),
             notifications_module_1.NotificationsModule,
             auth_module_1.AuthModule,
             config_1.ConfigModule,

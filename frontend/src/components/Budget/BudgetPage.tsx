@@ -5,12 +5,15 @@ import { useLayout } from '../../layouts/DashboardLayout';
 import { Card } from '../ui/Card';
 import { ProgressBar } from '../ui/ProgressBar';
 import { SetBudgetModal } from './SetBudgetModal';
+import { ConfirmModal } from '../ui/ConfirmModal';
 import { Trash2, AlertCircle } from 'lucide-react';
 
 const BudgetPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { setNavbarProps } = useLayout();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [budgetToDelete, setBudgetToDelete] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState(`${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`);
 
   const { list, loading } = useAppSelector((state) => state.budget);
@@ -27,10 +30,16 @@ const BudgetPage: React.FC = () => {
     dispatch(fetchBudgets(selectedMonth));
   }, [dispatch, selectedMonth]);
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this budget?')) {
-      await dispatch(deleteBudgetThunk(id));
+  const handleDeleteClick = (id: string) => {
+    setBudgetToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (budgetToDelete) {
+      await dispatch(deleteBudgetThunk(budgetToDelete));
       dispatch(fetchBudgets(selectedMonth));
+      setBudgetToDelete(null);
     }
   };
 
@@ -91,7 +100,7 @@ const BudgetPage: React.FC = () => {
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="font-semibold text-slate-900 dark:text-slate-100">{budget.category}</h4>
                   <button 
-                    onClick={() => handleDelete(budget._id)}
+                    onClick={() => handleDeleteClick(budget._id)}
                     className="text-slate-400 hover:text-red-500 transition-colors"
                   >
                     <Trash2 size={16} />
@@ -122,6 +131,15 @@ const BudgetPage: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         selectedMonth={selectedMonth}
         onSuccess={() => dispatch(fetchBudgets(selectedMonth))}
+      />
+
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Budget"
+        message="Are you sure you want to delete this budget?"
+        confirmText="Delete"
       />
     </div>
   );

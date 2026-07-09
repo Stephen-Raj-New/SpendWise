@@ -10,16 +10,19 @@ export class CategoriesController {
 
   @Get()
   async getCategories(@Request() req: any, @Query('type') type?: string) {
-    return this.categoriesService.getCategories(req.user.userId, type);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.categoriesService.getCategories(String(userId), type);
   }
 
   @Post()
   async createCategory(@Request() req: any, @Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoriesService.createCategory(req.user.userId, createCategoryDto);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.categoriesService.createCategory(String(userId), createCategoryDto);
   }
 
   @Delete(':id')
   async deleteCategory(@Request() req: any, @Param('id') id: string) {
-    return this.categoriesService.deleteCategory(req.user.userId, id);
+    const userId = req.user?.sub || req.user?.userId;
+    return this.categoriesService.deleteCategory(String(userId), id);
   }
 }
