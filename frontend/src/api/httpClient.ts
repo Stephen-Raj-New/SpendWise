@@ -23,6 +23,11 @@ httpClient.interceptors.response.use(
     
     // If 401 and we haven't retried yet
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // Skip auto-logout for authentication endpoints
+      if (originalRequest.url?.includes('/auth/login') || originalRequest.url?.includes('/auth/register') || originalRequest.url?.includes('/auth/verify-otp')) {
+        return Promise.reject(error);
+      }
+      
       originalRequest._retry = true;
       
       try {

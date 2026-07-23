@@ -2,10 +2,12 @@ import { Model, Types } from 'mongoose';
 import { Budget } from '../schemas/budget.schema';
 import { Expense } from '../schemas/expense.schema';
 import { SetBudgetDto } from './dto/set-budget.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 export declare class BudgetService {
     private budgetModel;
     private expenseModel;
-    constructor(budgetModel: Model<Budget>, expenseModel: Model<Expense>);
+    private notificationsService;
+    constructor(budgetModel: Model<Budget>, expenseModel: Model<Expense>, notificationsService: NotificationsService);
     private getMonthRange;
     getBudgets(userId: string, query: any): Promise<{
         _id: any;

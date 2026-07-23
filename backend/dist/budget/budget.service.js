@@ -18,12 +18,15 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const budget_schema_1 = require("../schemas/budget.schema");
 const expense_schema_1 = require("../schemas/expense.schema");
+const notifications_service_1 = require("../notifications/notifications.service");
 let BudgetService = class BudgetService {
     budgetModel;
     expenseModel;
-    constructor(budgetModel, expenseModel) {
+    notificationsService;
+    constructor(budgetModel, expenseModel, notificationsService) {
         this.budgetModel = budgetModel;
         this.expenseModel = expenseModel;
+        this.notificationsService = notificationsService;
     }
     getMonthRange(query = {}) {
         if (typeof query === 'string') {
@@ -110,7 +113,22 @@ let BudgetService = class BudgetService {
     }
     async setBudget(userId, dto) {
         const uid = new mongoose_2.Types.ObjectId(userId);
+        const oldBudget = await this.budgetModel.findOne({ userId: uid, category: dto.category, month: dto.month });
+        const oldLimit = oldBudget ? oldBudget.limit : 0;
         const budget = await this.budgetModel.findOneAndUpdate({ userId: uid, category: dto.category, month: dto.month }, { $set: { limit: dto.limit } }, { new: true, upsert: true });
+        if (oldLimit !== dto.limit) {
+            this.notificationsService.createNotification(userId, {
+                title: oldBudget ? 'Budget Updated' : 'Budget Created',
+                message: oldBudget
+                    ? `Budget limit for ${dto.category} was updated from ₹${oldLimit} to ₹${dto.limit}`
+                    : `New budget limit of ₹${dto.limit} set for ${dto.category}`,
+                type: 'system_update',
+                meta: { budgetId: budget._id, limit: dto.limit, oldLimit },
+                actions: [
+                    { label: 'View Budgets', actionType: 'navigate', payload: '/budget' }
+                ]
+            });
+        }
         return budget;
     }
     async deleteBudget(userId, id) {
@@ -128,6 +146,7 @@ exports.BudgetService = BudgetService = __decorate([
     __param(0, (0, mongoose_1.InjectModel)(budget_schema_1.Budget.name)),
     __param(1, (0, mongoose_1.InjectModel)(expense_schema_1.Expense.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
-        mongoose_2.Model])
+        mongoose_2.Model,
+        notifications_service_1.NotificationsService])
 ], BudgetService);
 //# sourceMappingURL=budget.service.js.map

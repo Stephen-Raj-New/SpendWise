@@ -18,16 +18,16 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const income_schema_1 = require("../schemas/income.schema");
 const category_schema_1 = require("../schemas/category.schema");
-const notifications_gateway_1 = require("../notifications/notifications.gateway");
+const notifications_service_1 = require("../notifications/notifications.service");
 const csv_writer_1 = require("csv-writer");
 let IncomeService = class IncomeService {
     incomeModel;
     categoryModel;
-    notificationsGateway;
-    constructor(incomeModel, categoryModel, notificationsGateway) {
+    notificationsService;
+    constructor(incomeModel, categoryModel, notificationsService) {
         this.incomeModel = incomeModel;
         this.categoryModel = categoryModel;
-        this.notificationsGateway = notificationsGateway;
+        this.notificationsService = notificationsService;
     }
     getDateRange(query) {
         if (typeof query === 'string')
@@ -173,10 +173,14 @@ let IncomeService = class IncomeService {
             userId: uid
         });
         const saved = await newIncome.save();
-        this.notificationsGateway.sendNotificationToUser(userId, {
+        this.notificationsService.createNotification(userId, {
             title: 'Income Received',
             message: `Income of ₹${saved.amount} received from ${saved.source}`,
-            type: 'success'
+            type: 'income_received',
+            meta: { incomeId: saved._id, amount: saved.amount },
+            actions: [
+                { label: 'View Income', actionType: 'navigate', payload: '/income' }
+            ]
         });
         return saved;
     }
@@ -186,7 +190,20 @@ let IncomeService = class IncomeService {
             throw new common_1.NotFoundException('Income not found');
         if (income.userId.toString() !== userId)
             throw new common_1.ForbiddenException('Not authorized');
-        return this.incomeModel.findByIdAndUpdate(id, updateIncomeDto, { new: true }).exec();
+        const oldAmount = income.amount;
+        const updated = await this.incomeModel.findByIdAndUpdate(id, updateIncomeDto, { new: true }).exec();
+        if (updated && updateIncomeDto.amount !== undefined && Number(updateIncomeDto.amount) !== oldAmount) {
+            this.notificationsService.createNotification(userId, {
+                title: 'Income Updated',
+                message: `Income from ${updated.source} was updated from ₹${oldAmount} to ₹${updated.amount}`,
+                type: 'system_update',
+                meta: { incomeId: updated._id, amount: updated.amount, oldAmount },
+                actions: [
+                    { label: 'View Income', actionType: 'navigate', payload: '/income' }
+                ]
+            });
+        }
+        return updated;
     }
     async remove(userId, id) {
         const income = await this.incomeModel.findById(id);
@@ -229,6 +246,6 @@ exports.IncomeService = IncomeService = __decorate([
     __param(1, (0, mongoose_1.InjectModel)(category_schema_1.Category.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
         mongoose_2.Model,
-        notifications_gateway_1.NotificationsGateway])
+        notifications_service_1.NotificationsService])
 ], IncomeService);
 //# sourceMappingURL=income.service.js.map

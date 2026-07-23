@@ -14,16 +14,22 @@ const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 let Notification = class Notification extends mongoose_2.Document {
     userId;
+    type;
     title;
     message;
-    type;
-    read;
+    meta;
+    isRead;
+    actions;
 };
 exports.Notification = Notification;
 __decorate([
-    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'User', required: true }),
+    (0, mongoose_1.Prop)({ type: mongoose_2.Types.ObjectId, ref: 'User', required: true, index: true }),
     __metadata("design:type", mongoose_2.Types.ObjectId)
 ], Notification.prototype, "userId", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ required: true, enum: ['budget_alert', 'bill_reminder', 'income_received', 'expense_added', 'system_update'] }),
+    __metadata("design:type", String)
+], Notification.prototype, "type", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ required: true }),
     __metadata("design:type", String)
@@ -33,15 +39,27 @@ __decorate([
     __metadata("design:type", String)
 ], Notification.prototype, "message", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ required: true, enum: ['info', 'warning', 'success', 'error'] }),
-    __metadata("design:type", String)
-], Notification.prototype, "type", void 0);
+    (0, mongoose_1.Prop)({ type: mongoose_2.Schema.Types.Mixed, default: {} }),
+    __metadata("design:type", Object)
+], Notification.prototype, "meta", void 0);
 __decorate([
     (0, mongoose_1.Prop)({ default: false }),
     __metadata("design:type", Boolean)
-], Notification.prototype, "read", void 0);
+], Notification.prototype, "isRead", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: [{
+                label: { type: String, required: true },
+                actionType: { type: String, required: true },
+                payload: { type: mongoose_2.Schema.Types.Mixed, required: true }
+            }],
+        default: []
+    }),
+    __metadata("design:type", Array)
+], Notification.prototype, "actions", void 0);
 exports.Notification = Notification = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Notification);
 exports.NotificationSchema = mongoose_1.SchemaFactory.createForClass(Notification);
+exports.NotificationSchema.index({ userId: 1, isRead: 1, createdAt: -1 });
 //# sourceMappingURL=notification.schema.js.map

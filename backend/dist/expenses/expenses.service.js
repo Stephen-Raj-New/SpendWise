@@ -17,14 +17,14 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
 const expense_schema_1 = require("../schemas/expense.schema");
-const notifications_gateway_1 = require("../notifications/notifications.gateway");
+const notifications_service_1 = require("../notifications/notifications.service");
 const csv_writer_1 = require("csv-writer");
 let ExpensesService = class ExpensesService {
     expenseModel;
-    notificationsGateway;
-    constructor(expenseModel, notificationsGateway) {
+    notificationsService;
+    constructor(expenseModel, notificationsService) {
         this.expenseModel = expenseModel;
-        this.notificationsGateway = notificationsGateway;
+        this.notificationsService = notificationsService;
     }
     getDateRange(query) {
         if (typeof query === 'string')
@@ -158,10 +158,14 @@ let ExpensesService = class ExpensesService {
             userId: new mongoose_2.Types.ObjectId(userId)
         });
         const saved = await newExpense.save();
-        this.notificationsGateway.sendNotificationToUser(userId, {
+        this.notificationsService.createNotification(userId, {
             title: 'Expense Added',
             message: `Expense of ₹${saved.amount} for ${saved.merchant} added.`,
-            type: 'info'
+            type: 'expense_added',
+            meta: { expenseId: saved._id, amount: saved.amount },
+            actions: [
+                { label: 'View Expense', actionType: 'navigate', payload: '/expenses' }
+            ]
         });
         return saved;
     }
@@ -171,7 +175,20 @@ let ExpensesService = class ExpensesService {
             throw new common_1.NotFoundException('Expense not found');
         if (expense.userId.toString() !== userId)
             throw new common_1.ForbiddenException('Not authorized');
-        return this.expenseModel.findByIdAndUpdate(id, updateExpenseDto, { new: true }).exec();
+        const oldAmount = expense.amount;
+        const updated = await this.expenseModel.findByIdAndUpdate(id, updateExpenseDto, { new: true }).exec();
+        if (updated && updateExpenseDto.amount !== undefined && Number(updateExpenseDto.amount) !== oldAmount) {
+            this.notificationsService.createNotification(userId, {
+                title: 'Expense Updated',
+                message: `Expense for ${updated.merchant} was updated from ₹${oldAmount} to ₹${updated.amount}`,
+                type: 'system_update',
+                meta: { expenseId: updated._id, amount: updated.amount, oldAmount },
+                actions: [
+                    { label: 'View Expense', actionType: 'navigate', payload: '/expenses' }
+                ]
+            });
+        }
+        return updated;
     }
     async remove(userId, id) {
         const expense = await this.expenseModel.findById(id);
@@ -206,6 +223,6 @@ exports.ExpensesService = ExpensesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(expense_schema_1.Expense.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
-        notifications_gateway_1.NotificationsGateway])
+        notifications_service_1.NotificationsService])
 ], ExpensesService);
 //# sourceMappingURL=expenses.service.js.map

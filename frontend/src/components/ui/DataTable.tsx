@@ -40,7 +40,7 @@ export function DataTable<T>({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+          <tbody className="divide-y divide-slate-200 dark:divide-slate-700 text-slate-900 dark:text-slate-100">
             {data.length === 0 ? (
               <tr>
                 <td colSpan={columns.length} className="px-6 py-8 text-center text-slate-500 dark:text-slate-400">

@@ -14,6 +14,7 @@ const budget_service_1 = require("./budget.service");
 const budget_schema_1 = require("../schemas/budget.schema");
 const expense_schema_1 = require("../schemas/expense.schema");
 const auth_module_1 = require("../auth/auth.module");
+const notifications_module_1 = require("../notifications/notifications.module");
 let BudgetModule = class BudgetModule {
 };
 exports.BudgetModule = BudgetModule;
@@ -25,6 +26,7 @@ exports.BudgetModule = BudgetModule = __decorate([
                 { name: expense_schema_1.Expense.name, schema: expense_schema_1.ExpenseSchema },
             ]),
             auth_module_1.AuthModule,
+            notifications_module_1.NotificationsModule,
         ],
         controllers: [budget_controller_1.BudgetController],
         providers: [budget_service_1.BudgetService],

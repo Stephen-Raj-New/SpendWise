@@ -10,6 +10,7 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
+const schedule_1 = require("@nestjs/schedule");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const auth_module_1 = require("./auth/auth.module");
@@ -23,6 +24,8 @@ const admin_module_1 = require("./admin/admin.module");
 const notifications_module_1 = require("./notifications/notifications.module");
 const reports_module_1 = require("./reports/reports.module");
 const dashboard_module_1 = require("./dashboard/dashboard.module");
+const profile_module_1 = require("./profile/profile.module");
+const settings_module_1 = require("./settings/settings.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -37,6 +40,7 @@ exports.AppModule = AppModule = __decorate([
                 }),
                 inject: [config_1.ConfigService],
             }),
+            schedule_1.ScheduleModule.forRoot(),
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
             income_module_1.IncomeModule,
@@ -48,6 +52,8 @@ exports.AppModule = AppModule = __decorate([
             notifications_module_1.NotificationsModule,
             admin_module_1.AdminModule,
             dashboard_module_1.DashboardModule,
+            profile_module_1.ProfileModule,
+            settings_module_1.SettingsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

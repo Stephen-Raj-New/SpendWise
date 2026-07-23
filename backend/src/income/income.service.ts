@@ -5,7 +5,7 @@ import { Income } from '../schemas/income.schema';
 import { Category } from '../schemas/category.schema';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
-import { NotificationsGateway } from '../notifications/notifications.gateway';
+import { NotificationsService } from '../notifications/notifications.service';
 import { createObjectCsvStringifier } from 'csv-writer';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class IncomeService {
   constructor(
     @InjectModel(Income.name) private incomeModel: Model<Income>,
     @InjectModel(Category.name) private categoryModel: Model<Category>,
-    private notificationsGateway: NotificationsGateway,
+    private notificationsService: NotificationsService,
   ) {}
 
   private getDateRange(query: any): { $gte: Date; $lte: Date } {
@@ -172,10 +172,14 @@ export class IncomeService {
     
     const saved = await newIncome.save();
     
-    this.notificationsGateway.sendNotificationToUser(userId, {
+    this.notificationsService.createNotification(userId, {
       title: 'Income Received',
       message: `Income of ₹${saved.amount} received from ${saved.source}`,
-      type: 'success'
+      type: 'income_received',
+      meta: { incomeId: saved._id, amount: saved.amount },
+      actions: [
+        { label: 'View Income', actionType: 'navigate', payload: '/income' }
+      ]
     });
 
     return saved;
@@ -186,7 +190,23 @@ export class IncomeService {
     if (!income) throw new NotFoundException('Income not found');
     if (income.userId.toString() !== userId) throw new ForbiddenException('Not authorized');
 
-    return this.incomeModel.findByIdAndUpdate(id, updateIncomeDto, { new: true }).exec();
+    const oldAmount = income.amount;
+    const updated = await this.incomeModel.findByIdAndUpdate(id, updateIncomeDto, { new: true }).exec();
+
+    // Send a notification if the amount was changed
+    if (updated && updateIncomeDto.amount !== undefined && Number(updateIncomeDto.amount) !== oldAmount) {
+      this.notificationsService.createNotification(userId, {
+        title: 'Income Updated',
+        message: `Income from ${updated.source} was updated from ₹${oldAmount} to ₹${updated.amount}`,
+        type: 'system_update',
+        meta: { incomeId: updated._id, amount: updated.amount, oldAmount },
+        actions: [
+          { label: 'View Income', actionType: 'navigate', payload: '/income' }
+        ]
+      });
+    }
+
+    return updated;
   }
 
   async remove(userId: string, id: string) {

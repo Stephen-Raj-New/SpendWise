@@ -4,12 +4,14 @@ import { Model, Types } from 'mongoose';
 import { Budget } from '../schemas/budget.schema';
 import { Expense } from '../schemas/expense.schema';
 import { SetBudgetDto } from './dto/set-budget.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class BudgetService {
   constructor(
     @InjectModel(Budget.name) private budgetModel: Model<Budget>,
     @InjectModel(Expense.name) private expenseModel: Model<Expense>,
+    private notificationsService: NotificationsService,
   ) {}
 
   private getMonthRange(query: any = {}): { start: Date; end: Date } {
@@ -104,12 +106,30 @@ export class BudgetService {
   async setBudget(userId: string, dto: SetBudgetDto) {
     const uid = new Types.ObjectId(userId);
     
+    // Check old budget
+    const oldBudget = await this.budgetModel.findOne({ userId: uid, category: dto.category, month: dto.month });
+    const oldLimit = oldBudget ? oldBudget.limit : 0;
+
     // Upsert budget for category and month
     const budget = await this.budgetModel.findOneAndUpdate(
       { userId: uid, category: dto.category, month: dto.month },
       { $set: { limit: dto.limit } },
       { new: true, upsert: true }
     );
+
+    if (oldLimit !== dto.limit) {
+       this.notificationsService.createNotification(userId, {
+        title: oldBudget ? 'Budget Updated' : 'Budget Created',
+        message: oldBudget 
+           ? `Budget limit for ${dto.category} was updated from ₹${oldLimit} to ₹${dto.limit}`
+           : `New budget limit of ₹${dto.limit} set for ${dto.category}`,
+        type: 'system_update',
+        meta: { budgetId: budget._id, limit: dto.limit, oldLimit },
+        actions: [
+          { label: 'View Budgets', actionType: 'navigate', payload: '/budget' }
+        ]
+      });
+    }
 
     return budget;
   }

@@ -32,6 +32,35 @@ export class User extends Document {
 
   @Prop()
   otpExpiresAt?: Date;
+
+  @Prop()
+  jobTitle?: string;
+
+  @Prop()
+  avatarUrl?: string;
+
+  @Prop({
+    type: {
+      defaultCurrency: { type: String, default: 'INR' },
+      displayLanguage: { type: String, default: 'en' },
+      emailNotifications: {
+        weeklyExpenseSummary: { type: Boolean, default: true },
+        budgetThresholdAlerts: { type: Boolean, default: true }
+      }
+    },
+    default: () => ({
+      defaultCurrency: 'INR',
+      displayLanguage: 'en',
+      emailNotifications: { weeklyExpenseSummary: true, budgetThresholdAlerts: true }
+    })
+  })
+  preferences: Record<string, any>;
+
+  @Prop({ default: true })
+  isActive: boolean;
+
+  @Prop({ default: false })
+  twoFactorEnabled: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

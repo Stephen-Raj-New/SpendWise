@@ -2,11 +2,11 @@ import { Model, Types } from 'mongoose';
 import { Expense } from '../schemas/expense.schema';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { NotificationsGateway } from '../notifications/notifications.gateway';
+import { NotificationsService } from '../notifications/notifications.service';
 export declare class ExpensesService {
     private expenseModel;
-    private notificationsGateway;
-    constructor(expenseModel: Model<Expense>, notificationsGateway: NotificationsGateway);
+    private notificationsService;
+    constructor(expenseModel: Model<Expense>, notificationsService: NotificationsService);
     private getDateRange;
     findAll(userId: string, query: any): Promise<{
         data: (import("mongoose").Document<unknown, {}, Expense, {}, import("mongoose").DefaultSchemaOptions> & Expense & Required<{

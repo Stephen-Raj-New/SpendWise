@@ -1,10 +1,12 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '../store/store';
 import { logout } from '../features/auth/redux/authSlice';
+import { connectSocket, disconnectSocket } from '../api/socket';
 import { Navbar } from '../components/layout/Navbar';
 import { ConfirmModal } from '../components/ui/ConfirmModal';
+import { fetchGroupedNotifications } from '../features/notifications/redux/notificationsThunk';
 import { 
   LayoutDashboard, 
   Wallet, 
@@ -43,11 +45,16 @@ const DashboardLayout = () => {
     onAction?: () => void;
   }>({});
 
+  useEffect(() => {
+    connectSocket();
+    dispatch(fetchGroupedNotifications() as any);
+  }, [dispatch]);
+
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogout = () => {
     dispatch(logout());
-    import('../api/socket').then(({ disconnectSocket }) => disconnectSocket());
+    disconnectSocket();
   };
 
   const userLinks = [

@@ -3,12 +3,12 @@ import { Income } from '../schemas/income.schema';
 import { Category } from '../schemas/category.schema';
 import { CreateIncomeDto } from './dto/create-income.dto';
 import { UpdateIncomeDto } from './dto/update-income.dto';
-import { NotificationsGateway } from '../notifications/notifications.gateway';
+import { NotificationsService } from '../notifications/notifications.service';
 export declare class IncomeService {
     private incomeModel;
     private categoryModel;
-    private notificationsGateway;
-    constructor(incomeModel: Model<Income>, categoryModel: Model<Category>, notificationsGateway: NotificationsGateway);
+    private notificationsService;
+    constructor(incomeModel: Model<Income>, categoryModel: Model<Category>, notificationsService: NotificationsService);
     private getDateRange;
     findAll(userId: string, query: any): Promise<{
         data: (import("mongoose").Document<unknown, {}, Income, {}, import("mongoose").DefaultSchemaOptions> & Income & Required<{

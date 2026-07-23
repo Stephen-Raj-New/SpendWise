@@ -4,14 +4,14 @@ import { Model, Types } from 'mongoose';
 import { Expense } from '../schemas/expense.schema';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
-import { NotificationsGateway } from '../notifications/notifications.gateway';
+import { NotificationsService } from '../notifications/notifications.service';
 import { createObjectCsvStringifier } from 'csv-writer';
 
 @Injectable()
 export class ExpensesService {
   constructor(
     @InjectModel(Expense.name) private expenseModel: Model<Expense>,
-    private notificationsGateway: NotificationsGateway,
+    private notificationsService: NotificationsService,
   ) {}
 
   private getDateRange(query: any): { $gte: Date; $lte: Date } {
@@ -156,10 +156,14 @@ export class ExpensesService {
     
     const saved = await newExpense.save();
     
-    this.notificationsGateway.sendNotificationToUser(userId, {
+    this.notificationsService.createNotification(userId, {
       title: 'Expense Added',
       message: `Expense of ₹${saved.amount} for ${saved.merchant} added.`,
-      type: 'info'
+      type: 'expense_added',
+      meta: { expenseId: saved._id, amount: saved.amount },
+      actions: [
+        { label: 'View Expense', actionType: 'navigate', payload: '/expenses' }
+      ]
     });
 
     return saved;
@@ -170,7 +174,22 @@ export class ExpensesService {
     if (!expense) throw new NotFoundException('Expense not found');
     if (expense.userId.toString() !== userId) throw new ForbiddenException('Not authorized');
 
-    return this.expenseModel.findByIdAndUpdate(id, updateExpenseDto, { new: true }).exec();
+    const oldAmount = expense.amount;
+    const updated = await this.expenseModel.findByIdAndUpdate(id, updateExpenseDto, { new: true }).exec();
+
+    if (updated && updateExpenseDto.amount !== undefined && Number(updateExpenseDto.amount) !== oldAmount) {
+      this.notificationsService.createNotification(userId, {
+        title: 'Expense Updated',
+        message: `Expense for ${updated.merchant} was updated from ₹${oldAmount} to ₹${updated.amount}`,
+        type: 'system_update',
+        meta: { expenseId: updated._id, amount: updated.amount, oldAmount },
+        actions: [
+          { label: 'View Expense', actionType: 'navigate', payload: '/expenses' }
+        ]
+      });
+    }
+
+    return updated;
   }
 
   async remove(userId: string, id: string) {

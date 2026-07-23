@@ -15,7 +15,8 @@ import BudgetPage from './components/Budget/BudgetPage';
 import CategoriesPage from './components/Categories/CategoriesPage';
 import ReportsPage from './components/Reports/ReportsPage';
 import NotificationsPage from './components/Notifications/NotificationsPage';
-import SettingsPage from './components/Settings/SettingsPage';
+import { ProfilePage } from './components/Profile/ProfilePage';
+import { SettingsPage } from './components/Settings/SettingsPage';
 import { Card } from './components/ui/Card';
 import { Toaster } from 'react-hot-toast';
 
@@ -55,7 +56,7 @@ const App = () => {
               <Route path="/categories" element={<CategoriesPage />} />
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/profile" element={<SettingsPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
 

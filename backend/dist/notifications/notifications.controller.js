@@ -21,9 +21,13 @@ let NotificationsController = class NotificationsController {
     constructor(notificationsService) {
         this.notificationsService = notificationsService;
     }
-    async getNotifications(req) {
+    async getNotifications(req, query) {
         const userId = req.user?.sub || req.user?.userId;
-        return this.notificationsService.getNotifications(String(userId));
+        return this.notificationsService.getNotifications(String(userId), query);
+    }
+    async getGroupedNotifications(req) {
+        const userId = req.user?.sub || req.user?.userId;
+        return this.notificationsService.getGroupedNotifications(String(userId));
     }
     async markAllAsRead(req) {
         const userId = req.user?.sub || req.user?.userId;
@@ -33,15 +37,27 @@ let NotificationsController = class NotificationsController {
         const userId = req.user?.sub || req.user?.userId;
         return this.notificationsService.markAsRead(String(userId), id);
     }
+    async deleteNotification(req, id) {
+        const userId = req.user?.sub || req.user?.userId;
+        return this.notificationsService.deleteNotification(String(userId), id);
+    }
 };
 exports.NotificationsController = NotificationsController;
 __decorate([
     (0, common_1.Get)(),
     __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], NotificationsController.prototype, "getNotifications", null);
+__decorate([
+    (0, common_1.Get)('grouped'),
+    __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
-], NotificationsController.prototype, "getNotifications", null);
+], NotificationsController.prototype, "getGroupedNotifications", null);
 __decorate([
     (0, common_1.Patch)('read-all'),
     __param(0, (0, common_1.Request)()),
@@ -57,6 +73,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], NotificationsController.prototype, "markAsRead", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], NotificationsController.prototype, "deleteNotification", null);
 exports.NotificationsController = NotificationsController = __decorate([
     (0, common_1.Controller)('user/notifications'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

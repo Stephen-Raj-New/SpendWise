@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -14,6 +15,8 @@ import { AdminModule } from './admin/admin.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ReportsModule } from './reports/reports.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ProfileModule } from './profile/profile.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -25,6 +28,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
       }),
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     UsersModule,
     IncomeModule,
@@ -36,6 +40,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
     NotificationsModule,
     AdminModule,
     DashboardModule,
+    ProfileModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

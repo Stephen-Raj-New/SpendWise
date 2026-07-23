@@ -27,6 +27,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const role = useSelector((state: RootState) => state.auth.role);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const unreadCount = useSelector((state: RootState) => state.notifications?.unreadCount || 0);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -76,7 +77,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             aria-label="Notifications"
           >
             <Bell size={20} />
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500 border-2 border-white dark:border-slate-900"></span>
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white border-2 border-white dark:border-slate-900">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
           </button>
 
           {actionLabel && (

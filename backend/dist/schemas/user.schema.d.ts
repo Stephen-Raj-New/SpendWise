@@ -10,6 +10,11 @@ export declare class User extends Document {
     role: string;
     otp?: string;
     otpExpiresAt?: Date;
+    jobTitle?: string;
+    avatarUrl?: string;
+    preferences: Record<string, any>;
+    isActive: boolean;
+    twoFactorEnabled: boolean;
 }
 export declare const UserSchema: import("mongoose").Schema<User, import("mongoose").Model<User, any, any, any, any, any, User>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, User, Document<unknown, {}, User, {
     id: string;
@@ -111,6 +116,51 @@ export declare const UserSchema: import("mongoose").Schema<User, import("mongoos
         id: string;
     }>> | undefined;
     otpExpiresAt?: import("mongoose").SchemaDefinitionProperty<Date | undefined, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    jobTitle?: import("mongoose").SchemaDefinitionProperty<string | undefined, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    avatarUrl?: import("mongoose").SchemaDefinitionProperty<string | undefined, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    preferences?: import("mongoose").SchemaDefinitionProperty<Record<string, any>, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    isActive?: import("mongoose").SchemaDefinitionProperty<boolean, User, Document<unknown, {}, User, {
+        id: string;
+    }, import("mongoose").DefaultSchemaOptions> & Omit<User & Required<{
+        _id: import("mongoose").Types.ObjectId;
+    }> & {
+        __v: number;
+    }, "id"> & import("mongoose").HydratedDocumentOverrides<{
+        id: string;
+    }>> | undefined;
+    twoFactorEnabled?: import("mongoose").SchemaDefinitionProperty<boolean, User, Document<unknown, {}, User, {
         id: string;
     }, import("mongoose").DefaultSchemaOptions> & Omit<User & Required<{
         _id: import("mongoose").Types.ObjectId;

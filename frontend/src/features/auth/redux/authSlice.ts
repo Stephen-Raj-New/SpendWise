@@ -13,12 +13,31 @@ interface AuthState {
   } | null;
 }
 
-const initialState: AuthState = {
-  token: null,
-  role: null,
-  isAuthenticated: false,
-  user: null,
+const getInitialState = (): AuthState => {
+  try {
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    if (token && userStr) {
+      const user = JSON.parse(userStr);
+      return {
+        token,
+        role: user.role,
+        isAuthenticated: true,
+        user
+      };
+    }
+  } catch (e) {
+    // skip
+  }
+  return {
+    token: null,
+    role: null,
+    isAuthenticated: false,
+    user: null,
+  };
 };
+
+const initialState: AuthState = getInitialState();
 
 const authSlice = createSlice({
   name: 'auth',
@@ -33,13 +52,17 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       if (action.payload.user) {
         state.user = action.payload.user;
+        localStorage.setItem('user', JSON.stringify(action.payload.user));
       }
+      localStorage.setItem('token', action.payload.token);
     },
     logout: (state) => {
       state.token = null;
       state.role = null;
       state.isAuthenticated = false;
       state.user = null;
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
     },
   },
 });

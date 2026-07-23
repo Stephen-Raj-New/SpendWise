@@ -5,6 +5,7 @@ import { BudgetService } from './budget.service';
 import { Budget, BudgetSchema } from '../schemas/budget.schema';
 import { Expense, ExpenseSchema } from '../schemas/expense.schema';
 import { AuthModule } from '../auth/auth.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AuthModule } from '../auth/auth.module';
       { name: Expense.name, schema: ExpenseSchema },
     ]),
     AuthModule,
+    NotificationsModule,
   ],
   controllers: [BudgetController],
   providers: [BudgetService],

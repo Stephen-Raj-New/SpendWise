@@ -23,6 +23,11 @@ let User = class User extends mongoose_2.Document {
     role;
     otp;
     otpExpiresAt;
+    jobTitle;
+    avatarUrl;
+    preferences;
+    isActive;
+    twoFactorEnabled;
 };
 exports.User = User;
 __decorate([
@@ -65,6 +70,40 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", Date)
 ], User.prototype, "otpExpiresAt", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], User.prototype, "jobTitle", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], User.prototype, "avatarUrl", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: {
+            defaultCurrency: { type: String, default: 'INR' },
+            displayLanguage: { type: String, default: 'en' },
+            emailNotifications: {
+                weeklyExpenseSummary: { type: Boolean, default: true },
+                budgetThresholdAlerts: { type: Boolean, default: true }
+            }
+        },
+        default: () => ({
+            defaultCurrency: 'INR',
+            displayLanguage: 'en',
+            emailNotifications: { weeklyExpenseSummary: true, budgetThresholdAlerts: true }
+        })
+    }),
+    __metadata("design:type", Object)
+], User.prototype, "preferences", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: true }),
+    __metadata("design:type", Boolean)
+], User.prototype, "isActive", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({ default: false }),
+    __metadata("design:type", Boolean)
+], User.prototype, "twoFactorEnabled", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], User);
