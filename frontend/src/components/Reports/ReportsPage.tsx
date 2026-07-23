@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLayout } from '../../layouts/DashboardLayout';
+import { useAppSelector } from '../../store/hooks';
 import { Card } from '../ui/Card';
 import { reportService, type SummaryReport } from '../../features/reports/services/reportService';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -12,6 +13,7 @@ const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 
 const ReportsPage: React.FC = () => {
   const { setNavbarProps } = useLayout();
+  const user = useAppSelector(state => state.auth.user);
   const [timeFilter, setTimeFilter] = useState<TimeFilterState>({
     range: 'year',
     year: new Date().getFullYear(),
@@ -60,7 +62,12 @@ const ReportsPage: React.FC = () => {
       title: `Financial Report`,
       filename: `report-${timeFilter.range}-${timeFilter.year}`,
       headers: monthlyHeaders,
-      data: monthlyPdfData
+      data: monthlyPdfData,
+      userInfo: user ? {
+        name: user.fullName,
+        email: user.email,
+        mobile: user.mobileNumber
+      } : undefined
     });
   };
 

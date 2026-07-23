@@ -17,6 +17,7 @@ export declare class DashboardController {
         income: any;
         expenses: any;
         budgetGoal: number;
+        overallAvailableBalance: number;
     }>;
     getIncomeVsExpense(req: RequestWithUser, query: any): Promise<{
         label: string;

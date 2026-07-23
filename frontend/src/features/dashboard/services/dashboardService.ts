@@ -6,6 +6,7 @@ export interface DashboardSummary {
   income: number;
   expenses: number;
   budgetGoal: number;
+  overallAvailableBalance: number;
 }
 
 export interface IncomeVsExpenseData {

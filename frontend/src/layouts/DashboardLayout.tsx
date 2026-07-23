@@ -51,24 +51,24 @@ const DashboardLayout = () => {
   };
 
   const userLinks = [
-    { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { to: '/income', label: 'Income', icon: <Wallet size={20} /> },
-    { to: '/expenses', label: 'Expenses', icon: <CreditCard size={20} /> },
-    { to: '/transactions', label: 'Transactions', icon: <ListOrdered size={20} /> },
-    { to: '/budget', label: 'Budget', icon: <PieChart size={20} /> },
-    { to: '/categories', label: 'Categories', icon: <Tags size={20} /> },
-    { to: '/reports', label: 'Reports', icon: <FileText size={20} /> },
-    { to: '/notifications', label: 'Notifications', icon: <Bell size={20} /> },
-    { to: '/profile', label: 'Profile', icon: <User size={20} /> },
-    { to: '/settings', label: 'Settings', icon: <Settings size={20} /> },
+    { to: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} className="text-blue-500" /> },
+    { to: '/income', label: 'Income', icon: <Wallet size={20} className="text-emerald-500" /> },
+    { to: '/expenses', label: 'Expenses', icon: <CreditCard size={20} className="text-red-500" /> },
+    { to: '/transactions', label: 'Transactions', icon: <ListOrdered size={20} className="text-amber-500" /> },
+    { to: '/budget', label: 'Budget', icon: <PieChart size={20} className="text-fuchsia-500" /> },
+    { to: '/categories', label: 'Categories', icon: <Tags size={20} className="text-indigo-500" /> },
+    { to: '/reports', label: 'Reports', icon: <FileText size={20} className="text-cyan-500" /> },
+    { to: '/notifications', label: 'Notifications', icon: <Bell size={20} className="text-yellow-500" /> },
+    { to: '/profile', label: 'Profile', icon: <User size={20} className="text-pink-500" /> },
+    { to: '/settings', label: 'Settings', icon: <Settings size={20} className="text-slate-500" /> },
   ];
 
   const adminLinks = [
-    { to: '/admin/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { to: '/admin/users', label: 'User Management', icon: <Users size={20} /> },
-    { to: '/admin/notifications', label: 'Notifications', icon: <Bell size={20} /> },
-    { to: '/admin/reports', label: 'Reports', icon: <FileText size={20} /> },
-    { to: '/admin/settings', label: 'Settings', icon: <Settings size={20} /> },
+    { to: '/admin/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} className="text-blue-500" /> },
+    { to: '/admin/users', label: 'User Management', icon: <Users size={20} className="text-violet-500" /> },
+    { to: '/admin/notifications', label: 'Notifications', icon: <Bell size={20} className="text-yellow-500" /> },
+    { to: '/admin/reports', label: 'Reports', icon: <FileText size={20} className="text-cyan-500" /> },
+    { to: '/admin/settings', label: 'Settings', icon: <Settings size={20} className="text-slate-500" /> },
   ];
 
   const links = role === 'admin' ? adminLinks : userLinks;

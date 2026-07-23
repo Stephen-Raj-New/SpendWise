@@ -18,9 +18,10 @@ interface SetBudgetModalProps {
   onClose: () => void;
   onSuccess: () => void;
   selectedMonth: string;
+  initialData?: { category: string; limit: number };
 }
 
-export const SetBudgetModal: React.FC<SetBudgetModalProps> = ({ isOpen, onClose, onSuccess, selectedMonth }) => {
+export const SetBudgetModal: React.FC<SetBudgetModalProps> = ({ isOpen, onClose, onSuccess, selectedMonth, initialData }) => {
   const dispatch = useAppDispatch();
   const categories = useAppSelector(state => state.category.list.filter(c => c.type === 'expense'));
 
@@ -36,9 +37,10 @@ export const SetBudgetModal: React.FC<SetBudgetModalProps> = ({ isOpen, onClose,
   
   const formik = useFormik({
     initialValues: {
-      category: '',
-      limit: '' as unknown as number,
+      category: initialData?.category || '',
+      limit: initialData?.limit || ('' as unknown as number),
     },
+    enableReinitialize: true,
     validationSchema: budgetSchema,
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       try {
@@ -69,8 +71,10 @@ export const SetBudgetModal: React.FC<SetBudgetModalProps> = ({ isOpen, onClose,
     },
   });
 
+  const isEditMode = !!initialData;
+
   return (
-    <Modal isOpen={isOpen} onClose={() => { formik.resetForm(); onClose(); }} title="Set Category Budget">
+    <Modal isOpen={isOpen} onClose={() => { formik.resetForm(); onClose(); }} title={isEditMode ? "Update Budget" : "Set Category Budget"}>
       <form onSubmit={formik.handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Category</label>
@@ -83,6 +87,7 @@ export const SetBudgetModal: React.FC<SetBudgetModalProps> = ({ isOpen, onClose,
             placeholder="Select or add category..."
             error={formik.touched.category && formik.errors.category ? formik.errors.category as string : undefined}
             onBlur={() => formik.setFieldTouched('category', true)}
+            isDisabled={isEditMode}
           />
         </div>
 
@@ -116,7 +121,7 @@ export const SetBudgetModal: React.FC<SetBudgetModalProps> = ({ isOpen, onClose,
             disabled={formik.isSubmitting}
             className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
           >
-            {formik.isSubmitting ? 'Saving...' : 'Save Budget'}
+            {formik.isSubmitting ? 'Saving...' : isEditMode ? 'Update Budget' : 'Save Budget'}
           </button>
         </div>
       </form>

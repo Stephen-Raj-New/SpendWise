@@ -16,7 +16,7 @@ import { ProgressBar } from '../ui/ProgressBar';
 import { InsightCard } from '../ui/InsightCard';
 import { TimeFilter } from '../ui/TimeFilter';
 import type { TimeFilterState } from '../ui/TimeFilter';
-import { Wallet, CreditCard, PiggyBank, IndianRupee } from 'lucide-react';
+import { Wallet, CreditCard, PiggyBank, IndianRupee, Coins } from 'lucide-react';
 import type { Transaction } from '../../features/dashboard/services/dashboardService';
 
 const DashboardPage: React.FC = () => {
@@ -84,11 +84,19 @@ const DashboardPage: React.FC = () => {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard
-          title="Total Balance"
+          title="Available Balance"
+          value={summary.data ? `₹${summary.data.overallAvailableBalance.toLocaleString()}` : '...'}
+          icon={<Coins />}
+          className="border-l-4 border-indigo-500"
+          iconClassName="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
+        />
+        <StatCard
+          title="Total Balance (Filtered)"
           value={summary.data ? `₹${summary.data.totalBalance.toLocaleString()}` : '...'}
           icon={<IndianRupee />}
+          iconClassName="bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
           trend={summary.data ? { value: summary.data.totalBalanceTrendPct, label: 'vs last month', isPositive: summary.data.totalBalanceTrendPct >= 0 } : undefined}
         />
         <StatCard
@@ -96,18 +104,21 @@ const DashboardPage: React.FC = () => {
           value={summary.data ? `₹${summary.data.income.toLocaleString()}` : '...'}
           icon={<Wallet />}
           className="border-l-4 border-emerald-500"
+          iconClassName="bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400"
         />
         <StatCard
           title="Total Expenses"
           value={summary.data ? `₹${summary.data.expenses.toLocaleString()}` : '...'}
           icon={<CreditCard />}
           className="border-l-4 border-red-500"
+          iconClassName="bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400"
         />
         <StatCard
           title="Budget Goal"
           value={summary.data ? `₹${summary.data.budgetGoal.toLocaleString()}` : '...'}
           icon={<PiggyBank />}
-          className="border-l-4 border-blue-500"
+          className="border-l-4 border-fuchsia-500"
+          iconClassName="bg-fuchsia-50 text-fuchsia-600 dark:bg-fuchsia-900/30 dark:text-fuchsia-400"
         />
       </div>
 

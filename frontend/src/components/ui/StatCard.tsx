@@ -13,14 +13,15 @@ interface StatCardProps {
     isPositive: boolean;
   };
   className?: string;
+  iconClassName?: string;
 }
 
-export const StatCard: React.FC<StatCardProps> = ({ title, value, icon, trend, className }) => {
+export const StatCard: React.FC<StatCardProps> = ({ title, value, icon, trend, className, iconClassName }) => {
   return (
     <Card className={cn('flex flex-col', className)}>
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</h3>
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+        <div className={cn("flex h-10 w-10 items-center justify-center rounded-lg", iconClassName || "bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400")}>
           {icon}
         </div>
       </div>

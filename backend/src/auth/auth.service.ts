@@ -90,7 +90,8 @@ export class AuthService {
         id: user._id,
         email: user.email,
         fullName: user.fullName,
-        role: user.role
+        role: user.role,
+        mobileNumber: user.mobileNumber
       }
     };
   }
@@ -120,7 +121,8 @@ export class AuthService {
         id: user._id,
         email: user.email,
         fullName: user.fullName,
-        role: user.role
+        role: user.role,
+        mobileNumber: user.mobileNumber
       }
     };
   }

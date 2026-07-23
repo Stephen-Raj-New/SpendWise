@@ -17,6 +17,7 @@ export declare class AuthService {
             email: string;
             fullName: string;
             role: string;
+            mobileNumber: string;
         };
     }>;
     login(loginDto: any): Promise<{
@@ -26,6 +27,7 @@ export declare class AuthService {
             email: string;
             fullName: string;
             role: string;
+            mobileNumber: string;
         };
     }>;
 }

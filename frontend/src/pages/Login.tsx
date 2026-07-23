@@ -8,7 +8,7 @@ import { loginService } from '../features/auth/services';
 import toast from 'react-hot-toast';
 import { Eye, EyeOff } from 'lucide-react';
 
-const DEV_AUTOFILL = false;
+const DEV_AUTOFILL = true;
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email is required'),
@@ -28,8 +28,8 @@ const Login = () => {
   const getInitialValues = () => {
     if (DEV_AUTOFILL) {
       return role === 'admin'
-        ? { email: 'admin@expensepro.com', password: 'User@123' }
-        : { email: 'user@expensepro.com', password: 'User@123' };
+        ? { email: 'admin@gmail.com', password: 'password' }
+        : { email: 'user@gmail.com', password: 'password' };
     }
     return { email: '', password: '' };
   };
@@ -37,10 +37,10 @@ const Login = () => {
   const handleSubmit = async (values: any, { setSubmitting, setStatus }: any) => {
     try {
       const data = await loginService({ ...values, role });
-      const { access_token } = data;
+      const { access_token, user } = data;
       const responseRole = data.role || role; 
       
-      dispatch(setCredentials({ token: access_token, role: responseRole }));
+      dispatch(setCredentials({ token: access_token, role: responseRole, user }));
       import('../api/socket').then(({ connectSocket }) => connectSocket());
 
       toast.success('Logged in successfully!');

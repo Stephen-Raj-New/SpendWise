@@ -6,7 +6,7 @@ import { Card } from '../ui/Card';
 import { ProgressBar } from '../ui/ProgressBar';
 import { SetBudgetModal } from './SetBudgetModal';
 import { ConfirmModal } from '../ui/ConfirmModal';
-import { Trash2, AlertCircle } from 'lucide-react';
+import { Trash2, AlertCircle, Edit2 } from 'lucide-react';
 import { TimeFilter } from '../ui/TimeFilter';
 import type { TimeFilterState } from '../ui/TimeFilter';
 import toast from 'react-hot-toast';
@@ -23,6 +23,7 @@ const BudgetPage: React.FC = () => {
     month: new Date().getMonth() + 1,
     quarter: Math.floor(new Date().getMonth() / 3) + 1,
   });
+  const [editingBudget, setEditingBudget] = useState<{ category: string; limit: number } | null>(null);
 
   const { list, loading } = useAppSelector((state) => state.budget);
 
@@ -30,7 +31,7 @@ const BudgetPage: React.FC = () => {
     setNavbarProps({
       searchPlaceholder: 'Search budgets...',
       actionLabel: 'Set Budget',
-      onAction: () => setIsModalOpen(true),
+      onAction: () => { setEditingBudget(null); setIsModalOpen(true); },
     });
   }, [setNavbarProps]);
 
@@ -109,12 +110,20 @@ const BudgetPage: React.FC = () => {
               <Card key={budget._id}>
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="font-semibold text-slate-900 dark:text-slate-100">{budget.category}</h4>
-                  <button 
-                    onClick={() => handleDeleteClick(budget._id)}
-                    className="text-slate-400 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 size={16} />
-                  </button>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => { setEditingBudget({ category: budget.category, limit: budget.limit }); setIsModalOpen(true); }}
+                      className="text-slate-400 hover:text-blue-500 transition-colors"
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteClick(budget._id)}
+                      className="text-slate-400 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
@@ -138,9 +147,10 @@ const BudgetPage: React.FC = () => {
 
       <SetBudgetModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => { setIsModalOpen(false); setEditingBudget(null); }}
         selectedMonth={timeFilter.month ? `${timeFilter.year}-${String(timeFilter.month).padStart(2, '0')}` : `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`}
         onSuccess={() => dispatch(fetchBudgets(timeFilter))}
+        initialData={editingBudget || undefined}
       />
 
       <ConfirmModal

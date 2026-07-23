@@ -129,7 +129,7 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
                 }}
               >
                 <Plus size={14} />
-                <span className="font-medium">Add "{inputValue.trim()}" as new category</span>
+                <span className="font-medium">Add "{inputValue.trim()}" to category</span>
               </button>
             </div>
           )}

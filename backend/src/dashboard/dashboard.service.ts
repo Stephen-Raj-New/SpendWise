@@ -54,12 +54,14 @@ export class DashboardService {
     prevDate.setMonth(prevDate.getMonth() - 1);
     const prevMonth = this.getMonthRange({ ...query, range: 'last-month' });
 
-    const [currentIncome, currentExpense, prevIncome, prevExpense, budgets] = await Promise.all([
+    const [currentIncome, currentExpense, prevIncome, prevExpense, budgets, overallIncome, overallExpense] = await Promise.all([
       this.incomeModel.aggregate([{ $match: { userId: uid, date: currentMonth, status: 'Confirmed' } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
       this.expenseModel.aggregate([{ $match: { userId: uid, date: currentMonth } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
       this.incomeModel.aggregate([{ $match: { userId: uid, date: prevMonth, status: 'Confirmed' } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
       this.expenseModel.aggregate([{ $match: { userId: uid, date: prevMonth } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
-      this.budgetModel.find({ userId: uid, month: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}` })
+      this.budgetModel.find({ userId: uid, month: `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}` }),
+      this.incomeModel.aggregate([{ $match: { userId: uid, status: 'Confirmed' } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
+      this.expenseModel.aggregate([{ $match: { userId: uid } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
     ]);
 
     const income = currentIncome[0]?.total || 0;
@@ -78,6 +80,7 @@ export class DashboardService {
     }
 
     const budgetGoal = budgets.reduce((acc, b) => acc + b.limit, 0);
+    const overallAvailableBalance = (overallIncome[0]?.total || 0) - (overallExpense[0]?.total || 0);
 
     return {
       totalBalance,
@@ -85,6 +88,7 @@ export class DashboardService {
       income,
       expenses,
       budgetGoal,
+      overallAvailableBalance,
     };
   } 
 

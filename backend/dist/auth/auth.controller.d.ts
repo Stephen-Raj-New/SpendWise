@@ -9,6 +9,7 @@ export declare class AuthController {
             email: string;
             fullName: string;
             role: string;
+            mobileNumber: string;
         };
     }>;
     register(registerDto: any): Promise<{
@@ -24,6 +25,7 @@ export declare class AuthController {
             email: string;
             fullName: string;
             role: string;
+            mobileNumber: string;
         };
     }>;
 }

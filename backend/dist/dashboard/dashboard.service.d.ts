@@ -16,6 +16,7 @@ export declare class DashboardService {
         income: any;
         expenses: any;
         budgetGoal: number;
+        overallAvailableBalance: number;
     }>;
     getIncomeVsExpense(userId: string, query?: any): Promise<{
         label: string;

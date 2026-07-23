@@ -114,7 +114,8 @@ let AuthService = class AuthService {
                 id: user._id,
                 email: user.email,
                 fullName: user.fullName,
-                role: user.role
+                role: user.role,
+                mobileNumber: user.mobileNumber
             }
         };
     }
@@ -138,7 +139,8 @@ let AuthService = class AuthService {
                 id: user._id,
                 email: user.email,
                 fullName: user.fullName,
-                role: user.role
+                role: user.role,
+                mobileNumber: user.mobileNumber
             }
         };
     }
